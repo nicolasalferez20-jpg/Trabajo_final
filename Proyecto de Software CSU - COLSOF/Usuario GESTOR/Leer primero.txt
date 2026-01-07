@@ -1,3 +1,0 @@
-interaccion Menu principal 
-
-Boton Nuevo Caso de servicio > Creacion de casos
