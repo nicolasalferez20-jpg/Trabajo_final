@@ -34,10 +34,10 @@
 
       // Asignar rutas a archivos existentes en el proyecto
       if (text.includes('reportes')) href = '../../Menu - Reportes.html';
-      else if (text.includes('estadísticas') || text.includes('estadisticas')) href = '../Usuario GESTOR/Menu - Estadisticas.html';
+      else if (text.includes('estadísticas') || text.includes('estadisticas')) href = '../../Menu - Estadisticas.html';
       else if (text.includes('notificaciones')) href = '../../Menu - Notificaciones.html';
       else if (text.includes('herramientas')) href = '../Usuario GESTOR/Menu - Herramientas.html';
-      else if (text.includes('configuración') || text.includes('configuracion')) href = '../Usuario GESTOR/Menu - Configuracion.html';
+      else if (text.includes('configuración') || text.includes('configuracion')) href = '../../Menu - Configuracion.html';
 
       if (href) {
         a.href = href;

@@ -18,11 +18,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Interceptar enlaces del menú (excepto Inicio si existe)
   $$('.menu-list a').forEach(a => {
-    if (a.id === 'link-inicio') return; // dejar navegar
+    if (a.id === 'link-inicio' || a.getAttribute('href').includes('Menu principal.html')) return; // dejar navegar
 
     // Permitir navegación a Notificaciones
     if (a.textContent.includes('Notificaciones') || a.querySelector('.badge')) {
       a.href = '../../Menu - Notificaciones.html';
+      return;
+    }
+
+    // Permitir navegación a Estadísticas
+    if (a.textContent.includes('Estadísticas') || a.textContent.includes('Estadisticas')) {
+      a.href = '../../Menu - Estadisticas.html';
+      return;
+    }
+
+    // Permitir navegación a Reportes
+    if (a.textContent.includes('Reportes')) {
+      a.href = '../../Menu - Reportes.html';
+      return;
+    }
+
+    // Permitir navegación a Configuración
+    if (a.textContent.includes('Configuración') || a.textContent.includes('Configuracion')) {
+      a.href = '../../Menu - Configuracion.html';
       return;
     }
 
