@@ -23,12 +23,21 @@ switch ($action) {
         $stats = [
             'reportes_generados' => 0,
             'descargas' => 0,
-            'usuarios_activos' => 0
+            'usuarios_activos' => 0,
+            'total_casos' => 0,
+            'resueltos' => 0,
+            'pendientes' => 0
         ];
 
         // Ejemplo: Contar casos totales
         $res = $conn->query("SELECT COUNT(*) as total FROM casos");
-        if ($res) $stats['reportes_generados'] = $res->fetch_assoc()['total'];
+        if ($res) {
+            $row = $res->fetch_assoc();
+            $stats['reportes_generados'] = $row['total'];
+            $stats['total_casos'] = $row['total'];
+            // Como aun no tenemos columna 'estado' en la BD, asumimos todos como pendientes por ahora
+            $stats['pendientes'] = $row['total']; 
+        }
 
         // Ejemplo: Contar usuarios
         $resUser = $conn->query("SELECT COUNT(*) as total FROM usuarios"); // Asumiendo tabla usuarios
@@ -82,6 +91,30 @@ switch ($action) {
             }
         }
         echo json_encode($cases);
+        break;
+
+    case 'get_notifications':
+        // Generar notificaciones basadas en los casos recientes (Simulación de tabla notificaciones)
+        $sql = "SELECT id, cliente, categoria, prioridad, fecha_creacion FROM casos ORDER BY fecha_creacion DESC LIMIT 10";
+        $result = $conn->query($sql);
+        $notifs = [];
+        
+        if ($result) {
+            while($row = $result->fetch_assoc()) {
+                // Determinar tipo de notificación según prioridad
+                $tipo = (strtolower($row['prioridad']) === 'alta' || strtolower($row['prioridad']) === 'critico') ? 'urgente' : 'sistema';
+                
+                $notifs[] = [
+                    'id' => $row['id'],
+                    'titulo' => "Nuevo caso: " . $row['cliente'],
+                    'mensaje' => "Se ha registrado un caso de categoría " . $row['categoria'] . " con prioridad " . $row['prioridad'],
+                    'fecha' => $row['fecha_creacion'],
+                    'tipo' => $tipo,
+                    'leido' => false 
+                ];
+            }
+        }
+        echo json_encode($notifs);
         break;
 
     default:

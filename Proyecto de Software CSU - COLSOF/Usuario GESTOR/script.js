@@ -389,4 +389,24 @@ document.addEventListener('DOMContentLoaded', () => {
       })
       .catch(err => console.error('Error cargando tabla:', err));
   })();
+
+  // =====================
+  // Carga de Datos para Estadísticas (Menu - Estadisticas.html)
+  // =====================
+  (function loadStatsData() {
+    const statTotal = document.getElementById('stat-total');
+    const statResolved = document.getElementById('stat-resolved');
+    const statPending = document.getElementById('stat-pending');
+
+    if (!statTotal && !statResolved && !statPending) return;
+
+    fetch(getApiUrl() + '?action=get_dashboard_stats')
+      .then(res => res.json())
+      .then(data => {
+        if (statTotal) statTotal.textContent = data.total_casos || 0;
+        if (statResolved) statResolved.textContent = data.resueltos || 0;
+        if (statPending) statPending.textContent = data.pendientes || 0;
+      })
+      .catch(err => console.error('Error cargando estadisticas:', err));
+  })();
 });
