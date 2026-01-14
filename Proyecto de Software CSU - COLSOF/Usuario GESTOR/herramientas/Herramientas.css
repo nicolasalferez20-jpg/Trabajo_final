@@ -44,10 +44,10 @@
 .tool-btn {
   margin-top: auto;
   padding: 10px;
-  background: #f8fafc;
-  border: 1px solid #d1d5db;
+  background: var(--brand-600);
+  border: 1px solid var(--brand-600);
   border-radius: 8px;
-  color: #374151;
+  color: #fff;
   font-weight: 600;
   cursor: pointer;
   text-align: center;
@@ -55,7 +55,7 @@
   transition: all 0.2s;
 }
 .tool-btn:hover {
-  background: #15467b;
+  background: var(--brand-700);
   color: #fff;
-  border-color: #15467b;
+  border-color: var(--brand-700);
 }
