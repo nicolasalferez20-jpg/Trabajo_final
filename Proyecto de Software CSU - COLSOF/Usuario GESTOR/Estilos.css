@@ -170,6 +170,60 @@ body {
     margin-left: auto;
 }
 
+.badge.hidden {
+    display: none;
+}
+
+/* Utility classes */
+.hidden {
+    display: none;
+}
+
+.header-spacer {
+    height: 52px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 8px;
+}
+
+.btn-secondary {
+    background: #6b7280;
+}
+
+.input-flex {
+    flex: 1;
+}
+
+.text-center-padded {
+    text-align: center;
+    padding: 20px;
+}
+
+.text-center-margin {
+    text-align: center;
+    margin-top: 8px;
+}
+
+.icon-success {
+    font-size: 48px;
+    color: #059669;
+    margin-bottom: 12px;
+}
+
+.text-muted {
+    color: #6b7280;
+    margin-top: 8px;
+}
+
+.icon-shield {
+    color: #15467b;
+    margin: 0 4px;
+}
+
 .sidebar-bottom { margin-top: auto; height: 40px; border-top: 1px solid #eef2f6; }
 
 /* MAIN */
@@ -233,6 +287,12 @@ h1 { font-size: 24px; color: #0b3a66; margin-bottom: 10px; }
     font-size: 22px;
     margin-bottom: 12px;
 }
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 18px;
+}
 .modal-btn {
     margin-top: 18px;
     padding: 8px 24px;
@@ -242,6 +302,16 @@ h1 { font-size: 24px; color: #0b3a66; margin-bottom: 10px; }
     border: none;
     border-radius: 6px;
     cursor: pointer;
+    transition: background 0.2s ease;
+}
+.modal-btn:hover {
+    background: #0f3f86;
+}
+.modal-btn.btn-secondary {
+    background: #6b7280;
+}
+.modal-btn.btn-secondary:hover {
+    background: #4b5563;
 }
 
 

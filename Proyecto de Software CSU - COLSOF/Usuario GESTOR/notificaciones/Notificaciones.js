@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(data => {
         notifications = data;
         renderNotifications('all');
-        updateBadge(data.length);
+        updateBadgeWithUnreadUrgent();
       })
       .catch(err => {
         console.error(err);
@@ -72,6 +72,18 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateBadge(count) {
     const badges = document.querySelectorAll('.badge');
     badges.forEach(b => b.textContent = count > 0 ? count : '');
+  }
+
+  // Actualizar badge solo con notificaciones sin leer o urgentes
+  function updateBadgeWithUnreadUrgent() {
+    const unreadOrUrgent = notifications.filter(n => !n.leido || n.tipo === 'urgente');
+    const count = unreadOrUrgent.length;
+    const badge = document.getElementById('notificationBadge');
+    
+    if (badge) {
+      badge.textContent = count;
+      badge.classList.toggle('hidden', count === 0);
+    }
   }
 
   // Eventos de filtros

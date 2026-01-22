@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CSU - Clientes</title>
   <link rel="stylesheet" href="../Estilos.css">
   <link rel="stylesheet" href="Clientes.css">
@@ -43,7 +44,7 @@
               <path d="M12 22a2 2 0 002-2H10a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.09a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="#111" stroke-width="1.2" fill="none"/>
             </svg>
             <span>Notificaciones</span>
-            <span class="badge">10</span>
+            <span class="badge hidden" id="notificationBadge">0</span>
           </a>
         </li>
         <li class="menu-item"><a href="../reportes/Menu - Reportes.html">
@@ -114,7 +115,7 @@
       <!-- Barra azul superior -->
       <div class="top-header">
         <div class="header-left">
-          <div style="height:52px"></div>
+          <div class="header-spacer"></div>
         </div>
         <div class="header-right">
           <div class="profile">
@@ -167,7 +168,7 @@
   <!-- Filtros -->
   <section class="filters">
     <input type="text" id="search" placeholder="Buscar cliente">
-    <select id="industryFilter">
+    <select id="industryFilter" title="Filtrar por industria">
       <option value="all">Todas las industrias</option>
       <option>Petróleo y Gas</option>
       <option>Financiero</option>
@@ -175,7 +176,7 @@
       <option>Salud</option>
       <option>Tecnología</option>
     </select>
-    <select id="statusFilter">
+    <select id="statusFilter" title="Filtrar por estado">
       <option value="all">Todos los estados</option>
       <option>Activo</option>
       <option>Inactivo</option>

@@ -106,6 +106,7 @@
         
         .change-pass-label {
             cursor: pointer;
+            -webkit-user-select: none;
             user-select: none;
         }
         
@@ -315,7 +316,7 @@
                         <div class="form-group password-group">
                             <label for="contrasena">Contraseña</label>
                             <div class="password-input-wrapper">
-                                <div class="input-with-icon" style="flex: 1;">
+                                <div class="input-with-icon input-flex">
                                     <i class="fas fa-key"></i>
                                     <input type="text" id="contrasena" name="contrasena" placeholder="Ingrese o genere una contraseña" required>
                                 </div>
@@ -329,7 +330,7 @@
                     <div class="form-row checkbox-row">
                         <label class="change-pass-label">
                             <input type="checkbox" name="cambiar_contrasena" value="1">
-                            <i class="fas fa-shield-alt" style="color: #15467b; margin: 0 4px;"></i>
+                            <i class="fas fa-shield-alt icon-shield"></i></i>
                             Solicitar cambio de contraseña en el primer inicio de sesión
                         </label>
                     </div>
@@ -346,16 +347,16 @@
 
 <div id="modal-exito" class="modal-construccion">
     <div class="modal-content">
-        <i class="fas fa-check-circle" style="font-size: 48px; color: #059669; margin-bottom: 12px;"></i>
+        <i class="fas fa-check-circle icon-success"></i></i>
         <h2 class="modal-title">¡Usuario creado con éxito!</h2>
-        <p style="color: #6b7280; margin-top: 8px;">El usuario ha sido registrado correctamente en el sistema</p>
+        <p class="text-muted">El usuario ha sido registrado correctamente en el sistema</p>
     </div>
 </div>
 <div id="modal-error" class="modal-construccion">
     <div class="modal-content">
-        <i class="fas fa-exclamation-triangle" style="font-size: 48px; color: #ef4444; margin-bottom: 12px;"></i>
+        <i class="fas fa-exclamation-triangle icon-error"></i>
         <h2 class="modal-title">Error en el registro</h2>
-        <p style="color: #6b7280; margin-top: 8px;">Por favor complete todos los campos requeridos correctamente.</p>
+        <p class="text-muted">Por favor complete todos los campos requeridos correctamente.</p>
         <button id="cerrar-modal-error" class="modal-btn"><i class="fas fa-times"></i> Cerrar</button>
     </div>
 </div>

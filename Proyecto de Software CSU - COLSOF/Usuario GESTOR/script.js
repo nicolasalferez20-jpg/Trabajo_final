@@ -16,6 +16,39 @@ document.addEventListener('DOMContentLoaded', () => {
     return 'Proyecto de Software CSU - COLSOF/Usuario GESTOR/api.php';
   };
 
+  // =====================
+  // Actualizar Badge de Notificaciones
+  // =====================
+  function updateBadgeWithUnreadUrgent() {
+    fetch(getApiUrl() + '?action=get_notifications')
+      .then(res => {
+        if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
+        return res.text().then(text => {
+          try {
+            return JSON.parse(text);
+          } catch (e) {
+            return [];
+          }
+        });
+      })
+      .then(notifications => {
+        const unreadOrUrgent = notifications.filter(n => !n.leido || n.tipo === 'urgente');
+        const count = unreadOrUrgent.length;
+        const badge = document.getElementById('notificationBadge');
+        
+        if (badge) {
+          badge.textContent = count;
+          badge.classList.toggle('hidden', count === 0);
+        }
+      })
+      .catch(err => console.error('Error al actualizar badge:', err));
+  }
+
+  // Actualizar badge al cargar la página
+  updateBadgeWithUnreadUrgent();
+  // Actualizar cada 30 segundos
+  setInterval(updateBadgeWithUnreadUrgent, 30000);
+
   // Determinar si estamos en una subcarpeta
   const isInSubfolder = () => {
     return window.location.pathname.includes('estadisticas') ||
@@ -392,4 +425,139 @@ document.addEventListener('DOMContentLoaded', () => {
       })
       .catch(err => console.error('Error cargando estadisticas:', err));
   })();
+
+  // =====================
+  // Funcionalidad de Creación de Casos
+  // =====================
+  const btnCrearCaso = document.getElementById('btn-crear-caso');
+  const btnGuardarBorrador = document.getElementById('btn-guardar-borrador');
+  const btnCancelar = document.getElementById('btn-cancelar');
+  const modalExito = document.getElementById('modal-exito');
+  const modalCancelar = document.getElementById('modal-cancelar');
+
+  if (btnCrearCaso) {
+    btnCrearCaso.addEventListener('click', async () => {
+      // Recopilar datos del formulario
+      const caseData = {
+        cliente: document.getElementById('cliente')?.value || '',
+        sede: document.getElementById('sede')?.value || '',
+        contacto: document.getElementById('contacto')?.value || '',
+        correo: document.getElementById('correo')?.value || '',
+        telefono: document.getElementById('telefono')?.value || '',
+        contacto2: document.getElementById('contacto2')?.value || '',
+        correo2: document.getElementById('correo2')?.value || '',
+        telefono2: document.getElementById('telefono2')?.value || '',
+        centro_costos: document.getElementById('centro-costos')?.value || '',
+        serial: document.getElementById('serial')?.value || '',
+        marca: document.getElementById('marca')?.value || '',
+        tipo: document.getElementById('tipo')?.value || '',
+        categoria: document.getElementById('categoria')?.value || '',
+        descripcion: document.getElementById('descripcion')?.value || '',
+        asignado: document.getElementById('asignar')?.value || '',
+        prioridad: document.getElementById('prioridad')?.value || '',
+        estado: 'Activo',
+        autor: 'Juan Pérez'
+      };
+
+      // Validar campos obligatorios
+      if (!caseData.cliente || !caseData.categoria || !caseData.prioridad) {
+        alert('Por favor complete los campos obligatorios: Cliente, Categoría y Prioridad');
+        return;
+      }
+
+      // Deshabilitar botón mientras se procesa
+      btnCrearCaso.disabled = true;
+      btnCrearCaso.textContent = 'Guardando...';
+
+      try {
+        const response = await fetch(getApiUrl() + '?action=save_case', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(caseData)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          // Mostrar modal de éxito
+          if (modalExito) {
+            modalExito.style.display = 'flex';
+            setTimeout(() => {
+              modalExito.style.display = 'none';
+              // Redirigir al menú principal
+              window.location.href = 'Menu principal.html';
+            }, 2000);
+          } else {
+            alert('Caso creado exitosamente');
+            window.location.href = 'Menu principal.html';
+          }
+        } else {
+          alert('Error al crear el caso: ' + (result.error || 'Error desconocido'));
+          btnCrearCaso.disabled = false;
+          btnCrearCaso.textContent = 'Crear Caso';
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error de conexión. Por favor intente nuevamente.');
+        btnCrearCaso.disabled = false;
+        btnCrearCaso.textContent = 'Crear Caso';
+      }
+    });
+  }
+
+  // Funcionalidad del botón Cancelar
+  if (btnCancelar && modalCancelar) {
+    btnCancelar.addEventListener('click', () => {
+      modalCancelar.style.display = 'flex';
+    });
+
+    const cancelYes = document.getElementById('cancel-yes');
+    const cancelNo = document.getElementById('cancel-no');
+
+    if (cancelYes) {
+      cancelYes.addEventListener('click', () => {
+        window.location.href = 'Menu principal.html';
+      });
+    }
+
+    if (cancelNo) {
+      cancelNo.addEventListener('click', () => {
+        modalCancelar.style.display = 'none';
+      });
+    }
+  }
+
+  // Actualizar resumen en tiempo real
+  const updateSummary = () => {
+    const cliente = document.getElementById('cliente')?.value;
+    const categoria = document.getElementById('categoria')?.value;
+    const prioridad = document.getElementById('prioridad')?.value;
+    const asignado = document.getElementById('asignar')?.value;
+
+    if (cliente) document.getElementById('summary-cliente').textContent = cliente;
+    if (categoria) {
+      const catSpan = document.getElementById('summary-categoria');
+      catSpan.textContent = categoria;
+      catSpan.className = 'pill ' + (categoria === 'Hardware' ? 'blue' : categoria === 'Software' ? 'purple' : 'gray');
+    }
+    if (prioridad) {
+      const prioSpan = document.getElementById('summary-prioridad');
+      prioSpan.textContent = prioridad;
+      const colorMap = { 'Critico': 'red', 'Alta': 'orange', 'Media': 'yellow', 'Baja': 'green' };
+      prioSpan.className = 'pill ' + (colorMap[prioridad] || 'gray');
+    }
+    if (asignado) document.getElementById('summary-tecnicos').textContent = asignado ? '1' : '0';
+  };
+
+  // Escuchar cambios en los campos
+  ['cliente', 'categoria', 'prioridad', 'asignar'].forEach(id => {
+    const elem = document.getElementById(id);
+    if (elem) {
+      elem.addEventListener('input', updateSummary);
+      elem.addEventListener('change', updateSummary);
+    }
+  });
 });
+

@@ -202,7 +202,7 @@
                                         <i data-lucide="trash-2" class="btn-icon"></i>
                                         Limpiar
                                     </button>
-                                    <button class="btn btn-success" id="export-results" style="display: none;">
+                                    <button class="btn btn-success hidden" id="export-results">
                                         <i data-lucide="download" class="btn-icon"></i>
                                         Exportar
                                     </button>
@@ -251,7 +251,7 @@
                                 <div class="backup-form">
                                     <div class="form-group">
                                         <label class="form-label">Tipo de Backup</label>
-                                        <select class="form-select" id="backup-type">
+                                        <select class="form-select" id="backup-type" title="Seleccionar tipo de backup">
                                             <option>Completo (Base de datos completa)</option>
                                             <option>Incremental (Solo cambios)</option>
                                             <option>Diferencial (Desde último completo)</option>
@@ -259,7 +259,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label class="form-label">Ubicación</label>
-                                        <input type="text" class="form-input" value="/backups/csu_backup_" id="backup-location">
+                                        <input type="text" class="form-input" value="/backups/csu_backup_" id="backup-location" title="Ubicación del backup">
                                     </div>
                                     <button class="btn btn-primary btn-full" id="create-backup">
                                         <i data-lucide="save" class="btn-icon"></i>
@@ -308,7 +308,7 @@
                                         <div class="backup-actions">
                                             <button class="btn-backup-action restore">Restaurar</button>
                                             <button class="btn-backup-action download">Descargar</button>
-                                            <button class="btn-backup-action delete">
+                                            <button class="btn-backup-action delete" aria-label="Eliminar backup">
                                                 <i data-lucide="trash-2" class="btn-icon-small"></i>
                                             </button>
                                         </div>
@@ -327,7 +327,7 @@
                                         <div class="backup-actions">
                                             <button class="btn-backup-action restore">Restaurar</button>
                                             <button class="btn-backup-action download">Descargar</button>
-                                            <button class="btn-backup-action delete">
+                                            <button class="btn-backup-action delete" aria-label="Eliminar backup">
                                                 <i data-lucide="trash-2" class="btn-icon-small"></i>
                                             </button>
                                         </div>
@@ -346,7 +346,7 @@
                                         <div class="backup-actions">
                                             <button class="btn-backup-action restore">Restaurar</button>
                                             <button class="btn-backup-action download">Descargar</button>
-                                            <button class="btn-backup-action delete">
+                                            <button class="btn-backup-action delete" aria-label="Eliminar backup">
                                                 <i data-lucide="trash-2" class="btn-icon-small"></i>
                                             </button>
                                         </div>
