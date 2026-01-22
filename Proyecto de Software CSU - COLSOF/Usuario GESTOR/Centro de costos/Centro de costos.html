@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CSU - Centro de Costos</title>
   <link rel="stylesheet" href="../Estilos.css">
   <link rel="stylesheet" href="Centro de costos.css">
@@ -114,7 +115,7 @@
       <div class="top-header">
         <div class="header-left">
           <!-- Bloque azul de ejemplo del diseño (sin contenido real) -->
-          <div style="height:52px"></div>
+          <div class="header-spacer"></div>
         </div>
         <div class="header-right">
           <div class="profile">
@@ -140,7 +141,7 @@
               <p>Gestión de presupuestos y facturación</p>
             </div>
           </div>
-          <button id="newBtn" class="btn btn-generate">Nuevo Centro de Costos</button>
+          <button id="newBtn" class="btn btn-generate">Buscar Centro de Costos</button>
         </header>
 
         <main>
@@ -168,7 +169,7 @@
           <!-- Filtros -->
           <section class="filters">
             <input type="text" id="search" placeholder="Buscar centro de costos">
-            <select id="statusFilter">
+            <select id="statusFilter" title="Filtrar por estado">
               <option value="all">Todos los estados</option>
               <option value="Activo">Activo</option>
               <option value="Alerta">Alerta</option>

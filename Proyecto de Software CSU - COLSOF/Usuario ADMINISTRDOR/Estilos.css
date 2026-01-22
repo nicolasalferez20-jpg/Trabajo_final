@@ -129,6 +129,46 @@ body {
     margin-left: auto;
 }
 
+.badge.hidden {
+    display: none;
+}
+
+/* Utility classes */
+.hidden {
+    display: none;
+}
+
+.text-center-margin {
+    text-align: center;
+    margin-top: 8px;
+}
+
+.icon-success {
+    font-size: 48px;
+    color: #059669;
+    margin-bottom: 12px;
+}
+
+.text-muted {
+    color: #6b7280;
+    margin-top: 8px;
+}
+
+.icon-shield {
+    color: #15467b;
+    margin: 0 4px;
+}
+
+.input-flex {
+    flex: 1;
+}
+
+.icon-error {
+    font-size: 48px;
+    color: #ef4444;
+    margin-bottom: 12px;
+}
+
 .sidebar-bottom { margin-top: auto; height: 40px; border-top: 1px solid #eef2f6; }
 
 /* MAIN */
@@ -465,6 +505,10 @@ h1 { font-size: 24px; color: #0b3a66; margin-bottom: 10px; }
 .progress-top .value { color: #111827; font-weight: 700; }
 .progress { height: 8px; background: #eef2f7; border-radius: 999px; overflow: hidden; }
 .bar { height: 100%; background: var(--col-purple); border-radius: 999px; }
+.bar.w-92 { width: 92%; }
+.bar.w-58 { width: 58%; }
+.bar.w-36 { width: 36%; }
+.bar.w-22 { width: 22%; }
 
 /* Lista de usuarios */
 .list { display: flex; flex-direction: column; }

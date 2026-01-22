@@ -48,7 +48,7 @@
                             <path d="M9 17a3 3 0 0 0 6 0" stroke="#0b3a66" stroke-width="1.6" stroke-linecap="round"/>
                         </svg>
                         <span>Notificaciones</span>
-                        <span class="badge">10</span>
+                        <span class="badge hidden" id="notificationBadge">0</span>
                     </a>
                 </li>
 
@@ -146,7 +146,7 @@
                       <p>Análisis del desempeño del centro de soporte</p>
                     </div>
                     <div class="header-actions">
-                        <select id="dateRange">
+                        <select id="dateRange" title="Seleccionar rango de fechas">
                             <option value="7days">Últimos 7 días</option>
                             <option value="30days" selected>Últimos 30 días</option>
                             <option value="3months">Últimos 3 meses</option>
