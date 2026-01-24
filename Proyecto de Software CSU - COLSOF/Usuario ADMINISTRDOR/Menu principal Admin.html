@@ -214,7 +214,7 @@
               <div class="card-title">Lista de Usuarios</div>
               <div class="card-subtitle">Base de datos SQL</div>
             </div>
-            <a class="card-action-link" href="#">Ver todo →</a>
+            <a class="card-action-link" href="Usuarios/Lista/Lista.html">Ver todo →</a>
           </div>
 
           <div class="list" role="table" aria-label="Lista de usuarios">
@@ -316,6 +316,14 @@
         </div>
       </section>
     </main>
+  </div>
+
+  <!-- Indicador de actualización automática -->
+  <div id="autoRefreshIndicator" style="position: fixed; bottom: 20px; right: 20px; background: #15467b; color: white; padding: 12px 20px; border-radius: 25px; font-size: 13px; font-weight: 600; box-shadow: 0 4px 12px rgba(21,70,123,0.3); display: flex; align-items: center; gap: 10px; z-index: 1000; opacity: 0.8; transition: opacity 0.3s;">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="animation: spin 2s linear infinite;">
+      <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <span>Actualización automática activa</span>
   </div>
 
   <script src="scripts.js" defer></script>

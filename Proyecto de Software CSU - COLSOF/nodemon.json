@@ -1,0 +1,11 @@
+{
+  "watch": ["Usuario GESTOR"],
+  "ext": "js,mjs,json",
+  "ignore": ["node_modules", "*.log"],
+  "delay": 1000,
+  "verbose": true,
+  "restartable": "rs",
+  "env": {
+    "NODE_ENV": "development"
+  }
+}

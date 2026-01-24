@@ -1,86 +1,10 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Datos de ejemplo para las notificaciones
-    const notificacionesSistema = [
-        {
-            id: 1,
-            tipo: 'critical',
-            titulo: 'Uso de CPU por encima del 80%',
-            mensaje: 'El servidor CSU-PROD-01 ha estado usando más del 80% de CPU durante los últimos 15 minutos',
-            fecha: '2026-01-19 15:45',
-            origen: 'Monitor Sistema',
-            estado: 'unread',
-            prioridad: 'high',
-            icon: 'fa-server'
-        },
-        {
-            id: 2,
-            tipo: 'warning',
-            titulo: 'Backup tardó más de lo esperado',
-            mensaje: 'El backup automático de las 08:00 tardó 45 minutos (normal: 20 minutos)',
-            fecha: '2026-01-19 08:45',
-            origen: 'Servicio Backup',
-            estado: 'read',
-            prioridad: 'medium',
-            icon: 'fa-database'
-        },
-        {
-            id: 3,
-            tipo: 'info',
-            titulo: 'Actualización disponible',
-            mensaje: 'CSU v2.1.1 está disponible con correcciones de seguridad',
-            fecha: '2026-01-19 07:00',
-            origen: 'Sistema',
-            estado: 'unread',
-            prioridad: 'low',
-            icon: 'fa-info-circle'
-        },
-        {
-            id: 4,
-            tipo: 'security',
-            titulo: 'Intento de acceso no autorizado',
-            mensaje: '5 intentos fallidos de inicio de sesión desde IP 192.168.1.99',
-            fecha: '2026-01-19 03:30',
-            origen: 'Sistema Seguridad',
-            estado: 'unread',
-            prioridad: 'high',
-            icon: 'fa-shield-alt'
-        }
-    ];
+    // Initialize with dynamic data from API
+    let notificacionesSistema = [];
+    let notificacionesUsuarios = [];
+    const API_BASE = 'http://localhost:3001/api?action=get_casos_simple';
 
-    const notificacionesUsuarios = [
-        {
-            id: 5,
-            tipo: 'activity',
-            titulo: 'Nuevo usuario registrado',
-            mensaje: 'Roberto Silva ha sido registrado con rol Empleado',
-            fecha: '2026-01-19 14:30',
-            usuario: 'Pedro Sánchez',
-            estado: 'unread',
-            icon: 'fa-users'
-        },
-        {
-            id: 6,
-            tipo: 'activity',
-            titulo: 'Usuario inactivado',
-            mensaje: 'Diana López ha sido marcada como inactiva',
-            fecha: '2026-01-19 11:00',
-            usuario: 'Pedro Sánchez',
-            estado: 'read',
-            icon: 'fa-users'
-        },
-        {
-            id: 7,
-            tipo: 'warning',
-            titulo: 'Usuario requiere reactivación',
-            mensaje: 'Ana Rodríguez ha solicitado reactivación de cuenta',
-            fecha: '2026-01-19 10:15',
-            usuario: 'Ana Rodríguez',
-            estado: 'unread',
-            icon: 'fa-exclamation-triangle'
-        }
-    ];
-
-    // Elementos del DOM
+    // DOM elements
     const systemTab = document.getElementById('systemTab');
     const usersTab = document.getElementById('usersTab');
     const sendTab = document.getElementById('sendTab');
@@ -94,6 +18,143 @@ document.addEventListener('DOMContentLoaded', function() {
     const notificationForm = document.getElementById('notificationForm');
     const btnMarkRead = document.querySelector('.btn-mark-read');
 
+    // Load data from API
+    async function loadDataFromAPI() {
+        try {
+            const response = await fetch(API_BASE);
+            const casos = await response.json();
+            
+            if (Array.isArray(casos)) {
+                // Generate notifications from cases
+                generarNotificacionesDelSistema(casos);
+                generarNotificacionesDeUsuarios(casos);
+                
+                renderSystemNotifications();
+                renderUserNotifications();
+                updateStats();
+            }
+        } catch (error) {
+            console.error('Error loading data from API:', error);
+            showNotification('Error cargando datos', 'error');
+        }
+    }
+
+    function generarNotificacionesDelSistema(casos) {
+        notificacionesSistema = [];
+        const estadoCounts = {};
+        const prioridades = ['critica', 'urgente', 'alta', 'media', 'baja'];
+        
+        casos.forEach(caso => {
+            estadoCounts[caso.estado] = (estadoCounts[caso.estado] || 0) + 1;
+        });
+
+        let id = 1;
+        const tipos = ['critical', 'warning', 'info', 'security'];
+        const iconos = ['fa-server', 'fa-database', 'fa-shield-alt', 'fa-exclamation-triangle'];
+        
+        // Notificaciones de casos críticos
+        const casosCriticos = casos.filter(c => c.prioridad === 'critica' || c.prioridad === 'urgente');
+        if (casosCriticos.length > 0) {
+            notificacionesSistema.push({
+                id: id++,
+                tipo: 'critical',
+                titulo: `${casosCriticos.length} casos de prioridad crítica/urgente`,
+                mensaje: `Hay ${casosCriticos.length} casos que requieren atención inmediata`,
+                fecha: new Date().toLocaleString('es-ES'),
+                origen: 'Monitor Sistema',
+                estado: 'unread',
+                prioridad: 'high',
+                icon: 'fa-exclamation-circle'
+            });
+        }
+
+        // Notificaciones de resumen por estado
+        Object.entries(estadoCounts).forEach(([estado, count]) => {
+            if (count > 0) {
+                const estadoMap = {
+                    'abierto': { text: 'Abiertos', icon: 'fa-unlock' },
+                    'en_progreso': { text: 'En Progreso', icon: 'fa-hourglass-half' },
+                    'pausado': { text: 'Pausados', icon: 'fa-pause' },
+                    'resuelto': { text: 'Resueltos', icon: 'fa-check-circle' },
+                    'cerrado': { text: 'Cerrados', icon: 'fa-check-double' }
+                };
+                
+                const info = estadoMap[estado] || { text: estado, icon: 'fa-info-circle' };
+                
+                notificacionesSistema.push({
+                    id: id++,
+                    tipo: 'info',
+                    titulo: `${count} casos ${info.text.toLowerCase()}`,
+                    mensaje: `Resumen de casos en estado: ${info.text}`,
+                    fecha: new Date().toLocaleString('es-ES'),
+                    origen: 'Monitor Sistema',
+                    estado: 'read',
+                    prioridad: 'low',
+                    icon: info.icon
+                });
+            }
+        });
+
+        // Notificación de últimas actualizaciones
+        if (casos.length > 0) {
+            notificacionesSistema.push({
+                id: id++,
+                tipo: 'info',
+                titulo: `Base de datos sincronizada`,
+                mensaje: `${casos.length} casos cargados correctamente desde la BD`,
+                fecha: new Date().toLocaleString('es-ES'),
+                origen: 'Sistema Base de Datos',
+                estado: 'read',
+                prioridad: 'low',
+                icon: 'fa-database'
+            });
+        }
+    }
+
+    function generarNotificacionesDeUsuarios(casos) {
+        notificacionesUsuarios = [];
+        const usuarios = new Set();
+        const tecnicos = new Set();
+        let id = 101;
+
+        casos.forEach(caso => {
+            if (caso.autor) usuarios.add(caso.autor);
+            if (caso.asignado_a) tecnicos.add(caso.asignado_a);
+        });
+
+        // Notificaciones de usuarios activos
+        const usuariosArray = Array.from(usuarios);
+        usuariosArray.slice(0, 3).forEach((usuario, index) => {
+            const casosPorUsuario = casos.filter(c => c.autor === usuario).length;
+            notificacionesUsuarios.push({
+                id: id++,
+                tipo: 'activity',
+                titulo: `${usuario} ha creado ${casosPorUsuario} caso(s)`,
+                mensaje: `${usuario} es responsable de ${casosPorUsuario} casos en el sistema`,
+                fecha: new Date(Date.now() - Math.random() * 24 * 60 * 60 * 1000).toLocaleString('es-ES'),
+                usuario: usuario,
+                estado: index === 0 ? 'unread' : 'read',
+                icon: 'fa-user-check'
+            });
+        });
+
+        // Notificaciones de técnicos activos
+        const tecnicosArray = Array.from(tecnicos);
+        tecnicosArray.slice(0, 2).forEach((tecnico, index) => {
+            const casosAsignados = casos.filter(c => c.asignado_a === tecnico).length;
+            notificacionesUsuarios.push({
+                id: id++,
+                tipo: 'activity',
+                titulo: `${tecnico} tiene ${casosAsignados} caso(s) asignado(s)`,
+                mensaje: `${tecnico} está trabajando en ${casosAsignados} casos actualmente`,
+                fecha: new Date(Date.now() - Math.random() * 24 * 60 * 60 * 1000).toLocaleString('es-ES'),
+                usuario: tecnico,
+                estado: 'read',
+                icon: 'fa-users'
+            });
+        });
+    }
+
     // Actualizar estadísticas
     function updateStats() {
         const criticalCount = notificacionesSistema.filter(n => n.prioridad === 'high').length;
@@ -101,25 +162,21 @@ document.addEventListener('DOMContentLoaded', function() {
         const systemNewCount = notificacionesSistema.filter(n => n.estado === 'unread').length;
         const usersCount = notificacionesUsuarios.length;
         const usersNewCount = notificacionesUsuarios.filter(n => n.estado === 'unread').length;
-        const securityCount = notificacionesSistema.filter(n => n.tipo === 'security').length;
-        const databaseCount = notificacionesSistema.filter(n => n.origen.includes('Backup') || n.origen.includes('Database')).length;
+        const securityCount = notificacionesSistema.filter(n => n.tipo === 'security' || n.tipo === 'critical').length;
+        const databaseCount = notificacionesSistema.filter(n => n.origen.includes('Base de Datos') || n.origen.includes('Database')).length;
         
         // Total de sin leer
         const totalUnread = systemNewCount + usersNewCount;
 
-        document.getElementById('criticalCount').textContent = criticalCount;
-        document.getElementById('systemCount').textContent = systemCount;
-        document.getElementById('systemNewCount').textContent = systemNewCount;
-        document.getElementById('usersCount').textContent = usersCount;
-        document.getElementById('usersNewCount').textContent = usersNewCount;
-        document.getElementById('securityCount').textContent = securityCount;
-        document.getElementById('databaseCount').textContent = databaseCount;
-        document.querySelector('.notification-count').textContent = criticalCount;
+        if (document.getElementById('criticalCount')) document.getElementById('criticalCount').textContent = criticalCount;
+        if (document.getElementById('systemCount')) document.getElementById('systemCount').textContent = systemCount;
+        if (document.getElementById('systemNewCount')) document.getElementById('systemNewCount').textContent = systemNewCount;
+        if (document.getElementById('usersCount')) document.getElementById('usersCount').textContent = usersCount;
+        if (document.getElementById('usersNewCount')) document.getElementById('usersNewCount').textContent = usersNewCount;
+        if (document.getElementById('securityCount')) document.getElementById('securityCount').textContent = securityCount;
+        if (document.getElementById('databaseCount')) document.getElementById('databaseCount').textContent = databaseCount;
+        if (document.querySelector('.notification-count')) document.querySelector('.notification-count').textContent = criticalCount;
 
-        // Actualizar contadores en pestañas
-        document.querySelectorAll('.tab-count')[0].textContent = systemCount;
-        document.querySelectorAll('.tab-count')[1].textContent = usersCount;
-        
         // Actualizar badge dinámicamente
         const badgeNotif = document.getElementById('badgeNotif');
         if (badgeNotif) {
@@ -136,9 +193,10 @@ document.addEventListener('DOMContentLoaded', function() {
     function renderSystemNotifications() {
         systemNotifications.innerHTML = '';
         
-        notificacionesSistema.forEach(notif => {
+        notificacionesSistema.forEach((notif, index) => {
             const notificationElement = document.createElement('div');
             notificationElement.className = `notification-item notification-${notif.tipo} notification-${notif.estado}`;
+            notificationElement.style.animation = `slideInUp ${0.3 + index * 0.05}s ease-out`;
             
             let priorityText = '';
             if (notif.prioridad === 'high') priorityText = 'ALTA';
@@ -166,12 +224,11 @@ document.addEventListener('DOMContentLoaded', function() {
                             </div>
                             <p class="notification-message">${notif.mensaje}</p>
                             <div class="notification-actions">
-                                <button class="btn-view" data-id="${notif.id}">
+                                <button class="btn-view" data-id="${notif.id}" onclick="markAsRead(this); return false;">
                                     <i class="fas fa-eye"></i>
-                                    Ver detalles
+                                    Marcar leído
                                 </button>
-                                ${notif.prioridad === 'high' ? '<button class="btn-resolve">Resolver</button>' : ''}
-                                <button class="btn-delete" data-id="${notif.id}">
+                                <button class="btn-delete" data-id="${notif.id}" data-type="system" onclick="deleteNotification(${notif.id}, 'system'); return false;">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
                             </div>
@@ -182,23 +239,16 @@ document.addEventListener('DOMContentLoaded', function() {
             
             systemNotifications.appendChild(notificationElement);
         });
-        
-        // Añadir event listeners a los botones de eliminar
-        document.querySelectorAll('.btn-delete').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const id = parseInt(this.getAttribute('data-id'));
-                deleteNotification(id, 'system');
-            });
-        });
     }
 
     // Renderizar notificaciones de usuarios
     function renderUserNotifications() {
         userNotifications.innerHTML = '';
         
-        notificacionesUsuarios.forEach(notif => {
+        notificacionesUsuarios.forEach((notif, index) => {
             const notificationElement = document.createElement('div');
             notificationElement.className = `notification-item notification-${notif.tipo} notification-${notif.estado}`;
+            notificationElement.style.animation = `slideInUp ${0.3 + index * 0.05}s ease-out`;
             
             notificationElement.innerHTML = `
                 <div class="notification-content">
@@ -213,17 +263,17 @@ document.addEventListener('DOMContentLoaded', function() {
                                         ${notif.estado === 'unread' ? '<span class="unread-indicator"></span>' : ''}
                                     </h3>
                                     <div class="notification-meta">
-                                        <span class="notification-source">Por: ${notif.usuario}</span>
+                                        <span class="notification-source">Usuario: ${notif.usuario}</span>
                                         <span class="notification-time">${notif.fecha}</span>
                                     </div>
                                 </div>
                             </div>
                             <p class="notification-message">${notif.mensaje}</p>
                             <div class="notification-actions">
-                                <button class="btn-resolve">
-                                    Ver usuario
+                                <button class="btn-resolve" onclick="markAsRead(this); return false;">
+                                    Marcar leído
                                 </button>
-                                <button class="btn-delete" data-id="${notif.id}">
+                                <button class="btn-delete" data-id="${notif.id}" data-type="users" onclick="deleteNotification(${notif.id}, 'users'); return false;">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
                             </div>
@@ -234,56 +284,54 @@ document.addEventListener('DOMContentLoaded', function() {
             
             userNotifications.appendChild(notificationElement);
         });
-        
-        // Añadir event listeners a los botones de eliminar
-        document.querySelectorAll('.btn-delete').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const id = parseInt(this.getAttribute('data-id'));
-                deleteNotification(id, 'users');
-            });
-        });
     }
 
     // Eliminar notificación
-    function deleteNotification(id, type) {
-        if (confirm('¿Está seguro de que desea eliminar esta notificación?')) {
-            if (type === 'system') {
-                const index = notificacionesSistema.findIndex(n => n.id === id);
-                if (index !== -1) {
-                    notificacionesSistema.splice(index, 1);
-                    renderSystemNotifications();
-                }
-            } else {
-                const index = notificacionesUsuarios.findIndex(n => n.id === id);
-                if (index !== -1) {
-                    notificacionesUsuarios.splice(index, 1);
-                    renderUserNotifications();
-                }
+    window.deleteNotification = function(id, type) {
+        if (type === 'system') {
+            const index = notificacionesSistema.findIndex(n => n.id === id);
+            if (index !== -1) {
+                notificacionesSistema.splice(index, 1);
+                renderSystemNotifications();
             }
-            updateStats();
+        } else {
+            const index = notificacionesUsuarios.findIndex(n => n.id === id);
+            if (index !== -1) {
+                notificacionesUsuarios.splice(index, 1);
+                renderUserNotifications();
+            }
         }
-    }
+        updateStats();
+    };
+
+    window.markAsRead = function(btn) {
+        btn.textContent = '✓ Leído';
+        btn.disabled = true;
+    };
 
     // Cambiar entre pestañas
     function switchTab(tabId) {
         // Ocultar todas las pestañas
-        systemTab.classList.remove('active');
-        usersTab.classList.remove('active');
-        sendTab.classList.remove('active');
+        if (systemTab) systemTab.classList.remove('active');
+        if (usersTab) usersTab.classList.remove('active');
+        if (sendTab) sendTab.classList.remove('active');
         
         // Remover clase active de todos los botones
         tabButtons.forEach(btn => btn.classList.remove('active'));
         
         // Mostrar la pestaña seleccionada
         if (tabId === 'system') {
-            systemTab.classList.add('active');
-            document.querySelector('[data-tab="system"]').classList.add('active');
+            if (systemTab) systemTab.classList.add('active');
+            const btn = document.querySelector('[data-tab="system"]');
+            if (btn) btn.classList.add('active');
         } else if (tabId === 'users') {
-            usersTab.classList.add('active');
-            document.querySelector('[data-tab="users"]').classList.add('active');
+            if (usersTab) usersTab.classList.add('active');
+            const btn = document.querySelector('[data-tab="users"]');
+            if (btn) btn.classList.add('active');
         } else if (tabId === 'send') {
-            sendTab.classList.add('active');
-            document.querySelector('[data-tab="send"]').classList.add('active');
+            if (sendTab) sendTab.classList.add('active');
+            const btn = document.querySelector('[data-tab="send"]');
+            if (btn) btn.classList.add('active');
         }
     }
 
@@ -296,31 +344,28 @@ document.addEventListener('DOMContentLoaded', function() {
         renderUserNotifications();
         updateStats();
         
-        alert('Todas las notificaciones han sido marcadas como leídas.');
+        showNotification('Todas las notificaciones marcadas como leídas', 'success');
     }
 
-    // Filtrar notificaciones
-    function setupFilterButtons() {
-        filterButtons.forEach(btn => {
-            btn.addEventListener('click', function() {
-                // Remover active de todos los botones de filtro en el mismo contenedor
-                this.parentElement.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                // Añadir active al botón clickeado
-                this.classList.add('active');
-                
-                // Aquí se implementaría la lógica de filtrado real
-                // Por ahora solo mostramos un mensaje
-                console.log('Filtrando por: ' + this.textContent);
-            });
-        });
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
+        notification.style.animation = 'slideIn 0.3s ease-out';
+        
+        const container = document.querySelector('.main-content') || document.body;
+        container.appendChild(notification);
+
+        setTimeout(() => {
+            notification.style.animation = 'slideOut 0.3s ease-out';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
     }
 
     // Inicializar
     function init() {
-        // Renderizar notificaciones iniciales
-        renderSystemNotifications();
-        renderUserNotifications();
-        updateStats();
+        // Cargar datos desde API
+        loadDataFromAPI();
         
         // Configurar event listeners para las pestañas
         tabButtons.forEach(btn => {
@@ -329,9 +374,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 switchTab(tabId);
             });
         });
-        
-        // Configurar botones de filtro
-        setupFilterButtons();
         
         // Configurar botón "Marcar todas como leídas"
         if (btnMarkRead) {
@@ -348,7 +390,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Configurar modal
         if (modalClose) {
             modalClose.addEventListener('click', function() {
-                notificationModal.style.display = 'none';
+                if (notificationModal) notificationModal.style.display = 'none';
             });
         }
         
@@ -363,15 +405,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 const recipients = document.getElementById('recipients').value;
                 
                 if (title.trim() && message.trim()) {
-                    alert(`Notificación enviada exitosamente a: ${recipients}\nTipo: ${type}\nTítulo: ${title}`);
+                    showNotification(`Notificación enviada a: ${recipients}`, 'success');
                     
                     // Resetear formulario
                     notificationForm.reset();
                     
                     // Cambiar a la pestaña de sistema
                     switchTab('system');
+                    
+                    // Recargar datos
+                    loadDataFromAPI();
                 } else {
-                    alert('Por favor complete todos los campos requeridos.');
+                    showNotification('Por favor complete todos los campos requeridos', 'error');
                 }
             });
         }
@@ -383,6 +428,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // Auto-refresh every 30 seconds
+    setInterval(() => {
+        loadDataFromAPI();
+    }, 30000);
 
     // Inicializar la aplicación
     init();

@@ -133,6 +133,8 @@
 
 .estado-Aprobado { background: #059669; }
 .estado-Pendiente { background: #f59e0b; color: #111827; }
+.estado-aprobado { background: #059669; }
+.estado-pendiente { background: #f59e0b; color: #111827; }
 
 .table-responsive { overflow-x: auto; border-radius: 12px; }
 
@@ -141,6 +143,7 @@
 #listView th, #listView td { padding: 14px 12px; text-align: left; border-bottom: 1px solid var(--color-slate-200); }
 #listView th { font-weight: 700; color: var(--color-slate-800); font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; }
 #listView td { color: var(--color-slate-700); font-size: 14px; }
+#listView tbody tr { transition: background-color 0.2s ease; }
 #listView tbody tr:hover { background: var(--color-slate-50); }
 
 .empty {
@@ -154,6 +157,82 @@
 }
 
 .hidden { display: none; }
+
+/* Animaciones */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+
+/* Notificaciones */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #fff;
+    z-index: 10000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    max-width: 300px;
+}
+
+.notification.info {
+    background-color: #3b82f6;
+}
+
+.notification.error {
+    background-color: #ef4444;
+}
+
+.notification.success {
+    background-color: #10b981;
+}
 
 @media (max-width: 960px) {
 	.toolbar { flex-direction: column; align-items: stretch; }

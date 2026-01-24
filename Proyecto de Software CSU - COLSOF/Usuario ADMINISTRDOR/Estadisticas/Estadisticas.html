@@ -133,10 +133,10 @@
       <div class="stats-container">
         <!-- Períodos -->
         <section class="periods">
-          <button onclick="setPeriod('week')">Última semana</button>
-          <button class="active" onclick="setPeriod('month')">Último mes</button>
-          <button onclick="setPeriod('quarter')">Trimestre</button>
-          <button onclick="setPeriod('year')">Año</button>
+          <button onclick="setPeriod('semana')">Última semana</button>
+          <button class="active" onclick="setPeriod('mes')">Último mes</button>
+          <button onclick="setPeriod('trimestre')">Trimestre</button>
+          <button onclick="setPeriod('ano')">Año</button>
 
           <button class="export">Exportar Reporte</button>
         </section>
@@ -145,25 +145,25 @@
         <section class="kpis">
           <div class="kpi blue">
             <span>Total Casos</span>
-            <strong id="totalCases"></strong>
-            <small>+12.5% vs anterior</small>
+            <strong id="totalCases">0</strong>
+            <small>Período seleccionado</small>
           </div>
 
           <div class="kpi green">
             <span>Casos Resueltos</span>
-            <strong>12,426</strong>
-            <small>25.8% del total</small>
+            <strong id="casosResueltos">0</strong>
+            <small>del total</small>
           </div>
 
           <div class="kpi amber">
             <span>Tiempo Promedio</span>
-            <strong>4.2 hrs</strong>
-            <small>-8.3% mejora</small>
+            <strong id="tiempoPromedio">0</strong>
+            <small>horas</small>
           </div>
 
           <div class="kpi purple">
             <span>Satisfacción</span>
-            <strong>4.6 / 5.0</strong>
+            <strong id="satisfaccion">4.5</strong>
             <div class="stars">★★★★★</div>
           </div>
         </section>

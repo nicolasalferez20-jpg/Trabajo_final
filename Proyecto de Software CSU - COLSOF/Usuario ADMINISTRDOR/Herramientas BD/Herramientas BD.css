@@ -870,6 +870,70 @@ body {
     background-color: #7c3aed;
 }
 
+/* Priority and State Badges */
+.priority-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.priority-badge.priority-high {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+.priority-badge.priority-medium {
+    background-color: #fef3c7;
+    color: #d97706;
+}
+
+.priority-badge.priority-low {
+    background-color: #dbeafe;
+    color: #2563eb;
+}
+
+.state-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.state-badge.state-resolved {
+    background-color: #dcfce7;
+    color: #16a34a;
+}
+
+.state-badge.state-paused {
+    background-color: #fef3c7;
+    color: #d97706;
+}
+
+.state-badge.state-closed {
+    background-color: #f3f4f6;
+    color: #6b7280;
+}
+
+.state-badge.state-open {
+    background-color: #e0e7ff;
+    color: #4f46e5;
+}
+
+/* Results Empty State */
+.results-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+    text-align: center;
+}
+
 /* Responsive adjustments */
 @media (max-width: 640px) {
     .db-container {

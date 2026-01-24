@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de API - Casos</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f6f7fb;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #15467b;
+            margin-bottom: 20px;
+        }
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background: #1d4ed8;
+        }
+        .success {
+            color: #22c55e;
+            padding: 15px;
+            background: #f0fdf4;
+            border-left: 4px solid #22c55e;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+        .error {
+            color: #dc2626;
+            padding: 15px;
+            background: #fef2f2;
+            border-left: 4px solid #dc2626;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 14px;
+        }
+        .status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .loading {
+            color: #3b82f6;
+            padding: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🧪 Prueba de API - Casos de Servicio</h1>
+        <p>Esta página prueba la conexión con la API y la base de datos PostgreSQL.</p>
+        
+        <div style="margin: 20px 0;">
+            <button onclick="probarGetCasosSimple()">🔍 Probar GET Casos Simple</button>
+            <button onclick="probarGetCasesList()">🔍 Probar GET Cases List</button>
+            <button onclick="probarConexion()">✅ Probar Conexión</button>
+        </div>
+        
+        <div id="status"></div>
+        <div id="resultado"></div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3001/api';
+        
+        function mostrarLoading() {
+            document.getElementById('status').innerHTML = '<div class="loading">⟳ Cargando...</div>';
+            document.getElementById('resultado').innerHTML = '';
+        }
+        
+        function mostrarError(mensaje, error) {
+            console.error(mensaje, error);
+            document.getElementById('status').innerHTML = `
+                <div class="error">
+                    <strong>❌ Error:</strong> ${mensaje}<br>
+                    <small>${error.message || error}</small>
+                </div>
+            `;
+        }
+        
+        function mostrarExito(mensaje, datos) {
+            document.getElementById('status').innerHTML = `
+                <div class="success">
+                    <strong>✅ Éxito:</strong> ${mensaje}
+                </div>
+            `;
+            
+            if (datos) {
+                const datosFormateados = JSON.stringify(datos, null, 2);
+                document.getElementById('resultado').innerHTML = `
+                    <h3>📊 Datos recibidos (${Array.isArray(datos) ? datos.length : 1} registro(s)):</h3>
+                    <pre>${datosFormateados}</pre>
+                `;
+            }
+        }
+        
+        async function probarGetCasosSimple() {
+            mostrarLoading();
+            try {
+                const response = await fetch(`${API_URL}?action=get_casos_simple`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const datos = await response.json();
+                mostrarExito(`Se obtuvieron ${datos.length} casos desde public.casos`, datos);
+                
+            } catch (error) {
+                mostrarError('No se pudo obtener los casos', error);
+            }
+        }
+        
+        async function probarGetCasesList() {
+            mostrarLoading();
+            try {
+                const response = await fetch(`${API_URL}?action=get_cases_list`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const datos = await response.json();
+                mostrarExito(`Se obtuvieron ${datos.length} casos desde base_de_datos_csu.ticket`, datos);
+                
+            } catch (error) {
+                mostrarError('No se pudo obtener los casos', error);
+            }
+        }
+        
+        async function probarConexion() {
+            mostrarLoading();
+            try {
+                const response = await fetch(`${API_URL}?action=get_next_id`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const datos = await response.json();
+                mostrarExito('Conexión exitosa con la API y base de datos', datos);
+                
+            } catch (error) {
+                mostrarError('No se pudo conectar con la API', error);
+            }
+        }
+        
+        // Probar automáticamente al cargar
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 Página de prueba cargada');
+            probarGetCasosSimple();
+        });
+    </script>
+</body>
+</html>

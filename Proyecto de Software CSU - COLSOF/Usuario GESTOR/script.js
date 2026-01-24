@@ -34,6 +34,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let casesPaginationInitialized = false;
 
+  const resolveLoginPath = () => {
+    const href = window.location.href;
+    const encodedMarker = 'Proyecto%20de%20Software%20CSU%20-%20COLSOF';
+    if (href.includes(encodedMarker)) return href.split(encodedMarker)[0] + `${encodedMarker}/index.html`;
+
+    const plainMarker = 'Proyecto de Software CSU - COLSOF';
+    if (href.includes(plainMarker)) return href.split(plainMarker)[0] + `${plainMarker}/index.html`;
+
+    return '/index.html';
+  };
+
+  const loginPath = resolveLoginPath();
+  $$('.logout-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      alert('Sesión cerrada.');
+      window.location.href = loginPath;
+    });
+  });
+
   // Estilos rápidos para el menú contextual y modales
   (function injectCaseMenuStyles() {
     if (document.getElementById('case-menu-styles')) return;
@@ -69,25 +88,18 @@ document.addEventListener('DOMContentLoaded', () => {
     'Alpina', 'Nutresa', 'Carvajal', 'Compensar', 'Sura', 'Seguros Bolívar'
   ];
 
-  // Determinar ruta de la API según dónde estemos (Raíz o Subcarpeta)
+  // API siempre usa servidor Node.js en localhost:3001
   const getApiUrl = () => {
-    // Intentar primero con servidor Node.js en localhost
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-      return 'http://localhost:3001/Usuario%20GESTOR/api.php';
-    }
-    
-    // Si la URL contiene 'Usuario GESTOR', el api.php está en la misma carpeta
-    if (window.location.pathname.includes('Usuario GESTOR')) {
-      return 'api.php';
-    }
-    // Si estamos en Menu principal.html (raíz de Proyecto de Software)
-    return 'Usuario GESTOR/api.php';
+    return 'http://localhost:3001';
   };
 
   // =====================
   // Actualizar Badge de Notificaciones
   // =====================
   function updateBadgeWithUnreadUrgent() {
+    // TODO: Implementar endpoint para notificaciones
+    return;
+    /* DESHABILITADO POR AHORA
     fetch(getApiUrl() + '?action=get_notifications')
       .then(res => {
         if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
@@ -111,6 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
       })
       .catch(err => console.error('Error al actualizar badge:', err));
   }
+  */
 
   // Actualizar badge al cargar la página
   updateBadgeWithUnreadUrgent();
@@ -419,7 +432,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (!tbody || !pagerContainer) return;
 
-    const itemsPerPage = 5; // 5 casos por página
+    const itemsPerPage = 12; // 12 casos por página
     let allCases = [];
     let currentPage = 1;
     let contextMenu;
@@ -671,7 +684,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Cargar datos
-    fetch(getApiUrl() + '?action=get_cases_list')
+    fetch(getApiUrl() + '?action=get_casos_simple')
       .then(res => {
         if (!res.ok) {
           throw new Error(`Error HTTP: ${res.status}`);
@@ -738,6 +751,93 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     }
+  })();
+
+  // =====================
+  // Auto-actualización de tabla de casos cada 30 segundos
+  // =====================
+  (function autoRefreshCases() {
+    const tbody = document.getElementById('cases-table-body');
+    const indicator = document.getElementById('autoRefreshIndicator');
+    if (!tbody) return;
+
+    let autoRefreshInterval;
+    let lastCasesCount = 0;
+
+    // Mostrar indicador de auto-actualización
+    if (indicator) {
+      indicator.style.display = 'flex';
+      setTimeout(() => {
+        indicator.style.opacity = '0.7';
+      }, 3000);
+    }
+
+    function refreshCasesData() {
+      fetch(getApiUrl() + '?action=get_casos_simple')
+        .then(res => res.ok ? res.json() : [])
+        .then(data => {
+          if (data && data.length > 0) {
+            // Solo actualizar si hay cambios en la cantidad de casos
+            if (data.length !== lastCasesCount) {
+              console.log(`🔄 Datos actualizados: ${data.length} casos (antes: ${lastCasesCount})`);
+              lastCasesCount = data.length;
+              allCases = data;
+              
+              // Re-renderizar la página actual
+              if (typeof renderPage === 'function') {
+                renderPage(currentPage);
+              }
+              
+              // Mostrar notificación sutil
+              showRefreshNotification(data.length);
+              
+              // Animar indicador
+              if (indicator) {
+                indicator.style.opacity = '1';
+                setTimeout(() => {
+                  indicator.style.opacity = '0.7';
+                }, 2000);
+              }
+            }
+          }
+        })
+        .catch(err => console.error('Error en auto-actualización:', err));
+    }
+
+    function showRefreshNotification(count) {
+      // Crear notificación temporal
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #22c55e;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10000;
+        font-weight: 600;
+        animation: slideIn 0.3s ease;
+      `;
+      notification.textContent = `✓ ${count} casos actualizados`;
+      document.body.appendChild(notification);
+
+      // Remover después de 3 segundos
+      setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+      }, 3000);
+    }
+
+    // Iniciar auto-actualización cada 30 segundos
+    autoRefreshInterval = setInterval(refreshCasesData, 30000);
+    console.log('✓ Auto-actualización de casos activada (cada 30 segundos)');
+
+    // Limpiar intervalo al salir de la página
+    window.addEventListener('beforeunload', () => {
+      if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+    });
   })();
 
   // =====================
@@ -970,6 +1070,150 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // =====================
+  // Sistema de Filtros Dinámicos
+  // =====================
+  (function initFilters() {
+    const filterBtn = document.getElementById('btn-filtros');
+    const filterModal = document.getElementById('filters-modal-overlay');
+    const filterClose = document.getElementById('filters-modal-close');
+    const filterResetBtn = document.getElementById('filters-reset-btn');
+    const filterApplyBtn = document.getElementById('filters-apply-btn');
+
+    if (!filterBtn || !filterModal) return;
+
+    let activeFilters = {
+      estados: [],
+      prioridades: [],
+      categoria: '',
+      tecnico: ''
+    };
+
+    // Abrir modal de filtros
+    filterBtn.addEventListener('click', () => {
+      filterModal.style.display = 'flex';
+    });
+
+    // Cerrar modal
+    filterClose.addEventListener('click', () => {
+      filterModal.style.display = 'none';
+    });
+
+    filterModal.addEventListener('click', (e) => {
+      if (e.target === filterModal) {
+        filterModal.style.display = 'none';
+      }
+    });
+
+    // Capturar cambios en checkboxes de estado
+    document.querySelectorAll('.filter-estado').forEach(checkbox => {
+      checkbox.addEventListener('change', () => {
+        activeFilters.estados = Array.from(document.querySelectorAll('.filter-estado:checked'))
+          .map(cb => cb.value);
+      });
+    });
+
+    // Capturar cambios en checkboxes de prioridad
+    document.querySelectorAll('.filter-prioridad').forEach(checkbox => {
+      checkbox.addEventListener('change', () => {
+        activeFilters.prioridades = Array.from(document.querySelectorAll('.filter-prioridad:checked'))
+          .map(cb => cb.value);
+      });
+    });
+
+    // Capturar cambios en selects
+    document.getElementById('filter-categoria').addEventListener('change', (e) => {
+      activeFilters.categoria = e.target.value;
+    });
+
+    document.getElementById('filter-tecnico').addEventListener('change', (e) => {
+      activeFilters.tecnico = e.target.value;
+    });
+
+    // Limpiar filtros
+    filterResetBtn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-estado, .filter-prioridad').forEach(cb => cb.checked = false);
+      document.getElementById('filter-categoria').value = '';
+      document.getElementById('filter-tecnico').value = '';
+      activeFilters = { estados: [], prioridades: [], categoria: '', tecnico: '' };
+      filterBtn.classList.remove('active-filters');
+    });
+
+    // Aplicar filtros
+    filterApplyBtn.addEventListener('click', () => {
+      applyFiltersToTable(activeFilters);
+      filterModal.style.display = 'none';
+      
+      // Mostrar badge si hay filtros activos
+      const hasActiveFilters = activeFilters.estados.length > 0 || 
+                               activeFilters.prioridades.length > 0 || 
+                               activeFilters.categoria || 
+                               activeFilters.tecnico;
+      filterBtn.classList.toggle('active-filters', hasActiveFilters);
+    });
+
+    // Función para aplicar filtros a la tabla
+    window.applyFiltersToTable = function(filters) {
+      const tbody = document.getElementById('cases-table-body');
+      if (!tbody) return;
+
+      const rows = tbody.querySelectorAll('tr');
+      let visibleCount = 0;
+
+      rows.forEach(row => {
+        let showRow = true;
+
+        // Filtro por estado
+        if (filters.estados.length > 0) {
+          const estadoCell = row.querySelector('td:nth-child(4)');
+          const estadoText = estadoCell?.textContent.trim().toLowerCase() || '';
+          const match = filters.estados.some(est => {
+            if (est === 'abierto') return estadoText.includes('activo');
+            if (est === 'en_progreso') return estadoText.includes('progreso');
+            return estadoText.includes(est);
+          });
+          showRow = showRow && match;
+        }
+
+        // Filtro por prioridad
+        if (filters.prioridades.length > 0) {
+          const prioridadCell = row.querySelector('td:nth-child(6)');
+          const prioridadText = prioridadCell?.textContent.trim().toLowerCase() || '';
+          const match = filters.prioridades.some(pri => {
+            if (pri === 'critica' || pri === 'urgente') return prioridadText.includes('urgente') || prioridadText.includes('crítica');
+            return prioridadText.includes(pri);
+          });
+          showRow = showRow && match;
+        }
+
+        // Filtro por categoría
+        if (filters.categoria) {
+          const categoriaCell = row.querySelector('td:nth-child(7)');
+          const categoriaText = categoriaCell?.textContent.trim() || '';
+          showRow = showRow && categoriaText === filters.categoria;
+        }
+
+        // Filtro por técnico asignado
+        if (filters.tecnico) {
+          const tecnicoCell = row.querySelector('td:nth-child(5)');
+          const tecnicoText = tecnicoCell?.textContent.trim() || '';
+          showRow = showRow && tecnicoText.includes(filters.tecnico);
+        }
+
+        row.style.display = showRow ? '' : 'none';
+        if (showRow) visibleCount++;
+      });
+
+      // Si no hay resultados
+      if (visibleCount === 0 && tbody.querySelectorAll('tr[style=""]').length === 0) {
+        const noResultsRow = tbody.querySelector('tr[style*="display: none"]');
+        if (!noResultsRow || tbody.querySelectorAll('tr').length === 1) {
+          tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:20px; color:#6b7280;">No hay casos que coincidan con los filtros seleccionados</td></tr>';
+        }
+      }
+    };
+  })();
+
+  // =====================
   // Paginación de Tabla de Casos (Menu principal.html)
   // =====================
   (function initCasesPagination() {
@@ -980,7 +1224,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (!tbody || !pagerContainer) return;
 
-    const itemsPerPage = 5; // 5 casos por página
+    const itemsPerPage = 12; // 12 casos por página
     let allCases = [];
     let currentPage = 1;
 
@@ -1086,8 +1330,8 @@ document.addEventListener('DOMContentLoaded', () => {
       nextBtn.style.cursor = currentPage === totalPages ? 'not-allowed' : 'pointer';
     }
 
-    // Cargar datos
-    fetch(getApiUrl() + '?action=get_cases_list')
+    // Cargar datos (segunda instancia)
+    fetch(getApiUrl() + '?action=get_casos_simple')
       .then(res => {
         if (!res.ok) {
           throw new Error(`Error HTTP: ${res.status}`);

@@ -181,6 +181,29 @@ const server = http.createServer(async (req, res) => {
         break;
       }
 
+      case 'get_casos_simple': {
+        // Leer casos desde la tabla public.casos
+        const casos = await sql`
+          SELECT 
+            id, 
+            cliente,
+            fecha_creacion,
+            estado,
+            asignado_a,
+            prioridad,
+            categoria,
+            autor,
+            descripcion,
+            fecha_actualizacion
+          FROM public.casos
+          ORDER BY fecha_creacion DESC
+        `;
+        
+        res.writeHead(200);
+        res.end(JSON.stringify(casos));
+        break;
+      }
+
       case 'get_cases_list': {
         const cases = await sql`
           SELECT 
@@ -500,13 +523,16 @@ const server = http.createServer(async (req, res) => {
 
 const PORT = 3001;
 server.listen(PORT, () => {
-  console.log(`✓ Servidor API ejecutándose en http://localhost:${PORT}`);
-  console.log(`  Endpoint: http://localhost:${PORT}/Usuario%20GESTOR/api.php?action=get_cases_list`);
+  console.log(`✓ Servidor API Node.js ejecutándose en http://localhost:${PORT}`);
+  console.log(`  Endpoint principal: http://localhost:${PORT}/api?action=get_casos_simple`);
+  console.log(`\n  ✅ PHP eliminado - Solo Node.js`);
   console.log(`\n  Acciones disponibles:`);
+  console.log(`  - get_casos_simple (principal - lee de public.casos)`);
   console.log(`  - get_cases_list`);
   console.log(`  - get_dashboard_stats`);
   console.log(`  - save_case`);
   console.log(`  - get_next_id`);
   console.log(`  - get_notifications`);
   console.log(`  - get_recent_reports`);
+  console.log(`  - get_estadisticas_avanzadas`);
 });

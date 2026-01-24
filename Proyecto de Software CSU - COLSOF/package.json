@@ -1,9 +1,12 @@
 {
   "type": "module",
   "dependencies": {
-    "postgres": "^3.4.8"
+    "postgres": "^3.4.8",
+    "nodemon": "^3.0.2"
   },
   "scripts": {
-    "start": "node 'Proyecto de Software CSU - COLSOF/Usuario GESTOR/api-server.js'"
+    "start": "node 'Usuario GESTOR/api-server.js'",
+    "dev": "nodemon 'Usuario GESTOR/api-server.js'",
+    "watch": "nodemon --watch 'Usuario GESTOR' 'Usuario GESTOR/api-server.js'"
   }
 }

@@ -468,9 +468,18 @@ h1 { font-size: 24px; color: #0b3a66; margin-bottom: 10px; }
 }
 .stat-title { font-size: 13px; color: #6b7280; letter-spacing: .3px; margin-bottom: 8px; text-transform: uppercase; }
 .stat-value { font-size: 26px; font-weight: 700; color: #0f172a; }
-.stat-change { font-size: 13px; margin-top: 6px; }
-.stat-change.positive { color: var(--col-good); }
-.stat-change.negative { color: var(--col-bad); }
+.stat-change { 
+  font-size: 13px; 
+  margin-top: 6px; 
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+.stat-change.positive { 
+  color: var(--col-good); 
+}
+.stat-change.negative { 
+  color: var(--col-bad); 
+}
 
 /* Cards y grid principal */
 .card {
@@ -548,4 +557,92 @@ h1 { font-size: 24px; color: #0b3a66; margin-bottom: 10px; }
 @media (max-width: 760px) {
   .stats-grid { grid-template-columns: 1fr; }
   .list-row { grid-template-columns: 1fr; gap: 8px; align-items: start; }
+}
+/* Animaciones */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes drawLine {
+  from { 
+    stroke-dashoffset: 1000;
+  }
+  to { 
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(400px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideOutRight {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(400px); opacity: 0; }
+}
+
+/* Indicador de actualización */
+#autoRefreshIndicator {
+  animation: fadeIn 0.5s ease;
+}
+
+#autoRefreshIndicator:hover {
+  opacity: 1 !important;
+  cursor: default;
+}
+
+/* Efectos de hover mejorados */
+.stat-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(21,70,123,0.12);
+}
+
+.btn {
+  transition: all 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+/* Estados de carga */
+.loading {
+  pointer-events: none;
+  opacity: 0.6;
+  position: relative;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid #15467b;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
 }

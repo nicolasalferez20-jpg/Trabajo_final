@@ -38,10 +38,197 @@
 .progress-fill { height: 100%; background: var(--col-primary); border-radius: 999px; }
 
 .activity-list { display: flex; flex-direction: column; gap: 10px; }
-.activity-item { padding: 10px 12px; background: #f8fafc; border: 1px solid var(--col-border); border-radius: 10px; color: #0f172a; }
+.activity-item { 
+  padding: 10px 12px; 
+  background: #f8fafc; 
+  border: 1px solid var(--col-border); 
+  border-radius: 10px; 
+  color: #0f172a;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+}
 
-.timeline { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
-.timeline li { padding: 10px 12px; border-left: 3px solid var(--col-primary); background: #f8fafc; border-radius: 10px; color: #0f172a; }
+.activity-item:hover {
+  background: #f0f9ff;
+  border-color: #3b82f6;
+}
+
+.activity-time {
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 600;
+  background: #e5edff;
+  padding: 2px 8px;
+  border-radius: 6px;
+  min-width: 50px;
+  text-align: center;
+}
+
+.activity-text {
+  flex: 1;
+  margin-left: 12px;
+}
+
+.timeline { 
+  list-style: none; 
+  padding: 0; 
+  margin: 0; 
+  display: flex; 
+  flex-direction: column; 
+  gap: 10px; 
+}
+
+.timeline li { 
+  padding: 12px 14px; 
+  border-left: 3px solid var(--col-primary); 
+  background: #f8fafc; 
+  border-radius: 10px; 
+  color: #0f172a;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  transition: all 0.2s ease;
+}
+
+.timeline li:hover {
+  background: #f0f9ff;
+  border-left-color: #2563eb;
+}
+
+.timeline-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+.timeline-dot.green {
+  background: #16a34a;
+}
+
+.timeline-dot.blue {
+  background: #2563eb;
+}
+
+.timeline-dot.amber {
+  background: #d97706;
+}
+
+.timeline-content {
+  flex: 1;
+}
+
+.timeline-time {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.timeline-text {
+  font-size: 14px;
+  color: #0f172a;
+  font-weight: 500;
+}
+
+/* Animaciones */
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+}
+
+.user-card {
+  transition: all 0.2s ease;
+}
+
+.user-card:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.notification {
+  animation: slideIn 0.3s ease;
+}
+
+.notification-success {
+  background: #16a34a;
+}
+
+.notification-error {
+  background: #dc2626;
+}
+
+.notification-info {
+  background: #2563eb;
+}
+
+.btn {
+  transition: all 0.2s ease;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.fa-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 
 @media (max-width: 1100px) {
   .monitor-kpis { grid-template-columns: repeat(2, minmax(0,1fr)); }

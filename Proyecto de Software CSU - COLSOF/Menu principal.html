@@ -165,7 +165,7 @@
       <!-- Filtros + Búsqueda -->
       <div class="filters-row">
         <div class="segmented" role="tablist" aria-label="Vistas">
-          <button class="active" role="tab" aria-selected="true">View all</button>
+          <button class="active" role="tab" aria-selected="true">Vista</button>
           <button role="tab">Monitored</button>
           <button role="tab">Text</button>
         </div>
@@ -175,9 +175,9 @@
           </span>
           <input type="search" placeholder="Search" aria-label="Buscar casos" />
         </div>
-        <button class="filters-btn" title="Filtros" aria-label="Filtros">
+        <button class="filters-btn" id="btn-filtros" title="Filtros" aria-label="Filtros">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 5h18M6 12h12M10 19h4" stroke="#374151" stroke-width="1.8" stroke-linecap="round"/></svg>
-          <span>Filters</span>
+          <span>Filtros</span>
         </button>
       </div>
 
@@ -203,11 +203,11 @@
           </tbody>
         </table>
         <div class="table-footer">
-          <button class="filters-btn" id="btn-prev">⟵ Previous</button>
+          <button class="filters-btn" id="btn-prev">⟵ Anterior</button>
           <div class="pager" id="pager-container">
             <!-- Los números de página se generan dinámicamente -->
           </div>
-          <button class="filters-btn" id="btn-next">Next ⟶</button>
+          <button class="filters-btn" id="btn-next">siguiente ⟶</button>
         </div>
       </section>
     </main>
@@ -218,6 +218,111 @@
     <div class="modal-content">
       <h2 id="modal-title" class="modal-title">En proceso de construcción</h2>
       <button id="cerrar-modal" class="modal-btn">Cerrar</button>
+    </div>
+  </div>
+
+  <!-- Indicador de auto-actualización -->
+  <div class="auto-refresh-indicator" id="autoRefreshIndicator" style="display: none;">
+    Actualización automática activa
+  </div>
+
+  <!-- Modal de Filtros -->
+  <div id="filters-modal-overlay" class="filters-modal-overlay" style="display: none;">
+    <div class="filters-modal-content">
+      <div class="filters-modal-header">
+        <h3>Filtros avanzados</h3>
+        <button class="filters-modal-close" id="filters-modal-close" aria-label="Cerrar">&times;</button>
+      </div>
+      
+      <div class="filters-modal-body">
+        <!-- Filtro por Estado -->
+        <div class="filter-group">
+          <label class="filter-label">Estado</label>
+          <div class="filter-options">
+            <label class="filter-checkbox">
+              <input type="checkbox" class="filter-estado" value="abierto" data-label="Activo" />
+              <span>Activo</span>
+            </label>
+            <label class="filter-checkbox">
+              <input type="checkbox" class="filter-estado" value="en_progreso" data-label="En Progreso" />
+              <span>En Progreso</span>
+            </label>
+            <label class="filter-checkbox">
+              <input type="checkbox" class="filter-estado" value="pausado" data-label="Pausado" />
+              <span>Pausado</span>
+            </label>
+            <label class="filter-checkbox">
+              <input type="checkbox" class="filter-estado" value="resuelto" data-label="Resuelto" />
+              <span>Resuelto</span>
+            </label>
+            <label class="filter-checkbox">
+              <input type="checkbox" class="filter-estado" value="cerrado" data-label="Cerrado" />
+              <span>Cerrado</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Filtro por Prioridad -->
+        <div class="filter-group">
+          <label class="filter-label">Prioridad</label>
+          <div class="filter-options">
+            <label class="filter-checkbox">
+              <input type="checkbox" class="filter-prioridad" value="critica" data-label="Crítica" />
+              <span>Crítica</span>
+            </label>
+            <label class="filter-checkbox">
+              <input type="checkbox" class="filter-prioridad" value="urgente" data-label="Urgente" />
+              <span>Urgente</span>
+            </label>
+            <label class="filter-checkbox">
+              <input type="checkbox" class="filter-prioridad" value="alta" data-label="Alta" />
+              <span>Alta</span>
+            </label>
+            <label class="filter-checkbox">
+              <input type="checkbox" class="filter-prioridad" value="media" data-label="Media" />
+              <span>Media</span>
+            </label>
+            <label class="filter-checkbox">
+              <input type="checkbox" class="filter-prioridad" value="baja" data-label="Baja" />
+              <span>Baja</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Filtro por Categoría -->
+        <div class="filter-group">
+          <label class="filter-label">Categoría</label>
+          <select id="filter-categoria" class="filter-select">
+            <option value="">-- Todas las categorías --</option>
+            <option value="TELEFONÍA">Telefonía</option>
+            <option value="BACKUP">Backup</option>
+            <option value="SEGURIDAD">Seguridad</option>
+            <option value="RED">Red</option>
+            <option value="SERVIDOR">Servidor</option>
+            <option value="SOFTWARE">Software</option>
+            <option value="HARDWARE">Hardware</option>
+          </select>
+        </div>
+
+        <!-- Filtro por Técnico Asignado -->
+        <div class="filter-group">
+          <label class="filter-label">Técnico Asignado</label>
+          <select id="filter-tecnico" class="filter-select">
+            <option value="">-- Todos los técnicos --</option>
+            <option value="Técnico 1">Técnico 1</option>
+            <option value="Técnico 2">Técnico 2</option>
+            <option value="Técnico 3">Técnico 3</option>
+            <option value="Técnico 4">Técnico 4</option>
+            <option value="Técnico 5">Técnico 5</option>
+            <option value="Carlos Méndez">Carlos Méndez</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="filters-modal-footer">
+        <button id="filters-reset-btn" class="btn-filters-reset">Limpiar filtros</button>
+        <button id="filters-apply-btn" class="btn-filters-apply">Aplicar filtros</button>
+      </div>
     </div>
   </div>
 

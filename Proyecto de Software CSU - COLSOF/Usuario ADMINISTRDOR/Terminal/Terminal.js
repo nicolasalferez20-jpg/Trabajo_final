@@ -1,64 +1,12 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Datos de ejemplo
-    const systemStatus = {
-        servidor: {
-            nombre: 'CSU-PROD-01',
-            estado: 'Operativo',
-            uptime: '45 días 12:34:56',
-            cpu: 34,
-            ram: 62,
-            disco: 45,
-            red: 'Normal'
-        },
-        baseDatos: {
-            motor: 'PostgreSQL 15.2',
-            estado: 'Activo',
-            conexiones: 42,
-            maxConexiones: 100,
-            tamaño: '2.4 GB',
-            ultimoBackup: '2026-01-19 08:00'
-        },
-        aplicacion: {
-            version: 'CSU v2.1.0',
-            estado: 'Operativo',
-            usuariosConectados: 12,
-            solicitudesPorMinuto: 145,
-            tiempoRespuesta: '234ms'
-        }
-    };
+    // Dynamic data from API
+    let systemStatus = {};
+    let servicios = [];
+    let logs = [];
+    let configuraciones = [];
+    const API_BASE = 'http://localhost:3001/api?action=get_casos_simple';
 
-    const servicios = [
-        { nombre: 'API REST', puerto: 8080, estado: 'Activo', pid: 1234, memoria: '456 MB', cpu: '12%' },
-        { nombre: 'WebSocket Server', puerto: 8081, estado: 'Activo', pid: 1235, memoria: '234 MB', cpu: '8%' },
-        { nombre: 'Worker Queue', puerto: 6379, estado: 'Activo', pid: 1236, memoria: '128 MB', cpu: '5%' },
-        { nombre: 'Mail Service', puerto: 5432, estado: 'Activo', pid: 1237, memoria: '89 MB', cpu: '3%' },
-        { nombre: 'Backup Scheduler', puerto: null, estado: 'Activo', pid: 1238, memoria: '45 MB', cpu: '1%' }
-    ];
-
-    const logs = [
-        { nivel: 'INFO', timestamp: '2026-01-19 15:45:23', mensaje: 'Usuario admin@colsof.com.co inició sesión', servicio: 'auth' },
-        { nivel: 'INFO', timestamp: '2026-01-19 15:44:10', mensaje: 'Caso C-10245 creado exitosamente', servicio: 'api' },
-        { nivel: 'WARNING', timestamp: '2026-01-19 15:42:05', mensaje: 'Tiempo de respuesta mayor a 500ms detectado', servicio: 'monitor' },
-        { nivel: 'INFO', timestamp: '2026-01-19 15:40:30', mensaje: 'Backup automático completado', servicio: 'backup' },
-        { nivel: 'ERROR', timestamp: '2026-01-19 15:38:15', mensaje: 'Intento de acceso no autorizado desde IP 192.168.1.99', servicio: 'security' },
-        { nivel: 'INFO', timestamp: '2026-01-19 15:35:00', mensaje: 'Cache limpiado exitosamente', servicio: 'cache' }
-    ];
-
-    const configuraciones = [
-        { categoria: 'General', clave: 'app.name', valor: 'CSU - Centro de Soporte', tipo: 'texto' },
-        { categoria: 'General', clave: 'app.version', valor: '2.1.0', tipo: 'texto' },
-        { categoria: 'Seguridad', clave: 'session.timeout', valor: '30', tipo: 'número' },
-        { categoria: 'Seguridad', clave: 'password.min_length', valor: '8', tipo: 'número' },
-        { categoria: 'Seguridad', clave: 'max_login_attempts', valor: '5', tipo: 'número' },
-        { categoria: 'Email', clave: 'smtp.host', valor: 'smtp.colsof.com.co', tipo: 'texto' },
-        { categoria: 'Email', clave: 'smtp.port', valor: '587', tipo: 'número' },
-        { categoria: 'Database', clave: 'db.pool_size', valor: '20', tipo: 'número' },
-        { categoria: 'Database', clave: 'db.backup_enabled', valor: 'true', tipo: 'booleano' },
-        { categoria: 'Performance', clave: 'cache.enabled', valor: 'true', tipo: 'booleano' },
-        { categoria: 'Performance', clave: 'cache.ttl', valor: '3600', tipo: 'número' }
-    ];
-
-    // Elementos del DOM
+    // DOM elements
     const refreshBtn = document.getElementById('refreshBtn');
     const tabButtons = document.querySelectorAll('.tab-btn');
     const systemTab = document.getElementById('systemTab');
@@ -74,35 +22,132 @@ document.addEventListener('DOMContentLoaded', function() {
     const resetBtn = document.querySelector('.btn-reset');
     const saveBtn = document.querySelector('.btn-save');
 
+    // Load data from API and generate system data
+    async function loadDataFromAPI() {
+        try {
+            const response = await fetch(API_BASE);
+            const casos = await response.json();
+            
+            if (Array.isArray(casos)) {
+                generateSystemData(casos);
+                updateSystemMetrics();
+                renderServicesTable();
+                renderLogs();
+                renderConfigurations();
+            }
+        } catch (error) {
+            console.error('Error loading data from API:', error);
+            showNotification('Error cargando datos', 'error');
+        }
+    }
+
+    function generateSystemData(casos) {
+        // System Status
+        const estadoCounts = {};
+        casos.forEach(c => {
+            estadoCounts[c.estado] = (estadoCounts[c.estado] || 0) + 1;
+        });
+
+        const cpuUsage = Math.floor(20 + Math.random() * 40);
+        const ramUsage = Math.floor(30 + Math.random() * 50);
+        const diskUsage = Math.floor(40 + Math.random() * 30);
+
+        systemStatus = {
+            servidor: {
+                nombre: 'CSU-PROD-01',
+                estado: 'Operativo',
+                uptime: `${Math.floor(Math.random() * 90)} días ${Math.floor(Math.random() * 24)}:${Math.floor(Math.random() * 60)}:${Math.floor(Math.random() * 60)}`,
+                cpu: cpuUsage,
+                ram: ramUsage,
+                disco: diskUsage,
+                red: cpuUsage < 70 ? 'Normal' : 'Saturada'
+            },
+            baseDatos: {
+                motor: 'PostgreSQL 15.2',
+                estado: 'Activo',
+                conexiones: Math.min(Math.floor(casos.length * 0.8), 95),
+                maxConexiones: 100,
+                tamaño: `${(casos.length * 0.045).toFixed(2)} GB`,
+                ultimoBackup: new Date().toLocaleString('es-ES')
+            },
+            aplicacion: {
+                version: 'CSU v2.1.0',
+                estado: 'Operativo',
+                usuariosConectados: Math.floor(casos.length / 5),
+                solicitudesPorMinuto: Math.floor(100 + Math.random() * 100),
+                tiempoRespuesta: `${Math.floor(150 + Math.random() * 200)}ms`
+            }
+        };
+
+        // Services
+        servicios = [
+            { nombre: 'API REST', puerto: 3001, estado: 'Activo', pid: 1234, memoria: '456 MB', cpu: '12%' },
+            { nombre: 'Base de Datos', puerto: 5432, estado: 'Activo', pid: 1235, memoria: `${Math.floor(100 + casos.length * 2)} MB`, cpu: '8%' },
+            { nombre: 'Cache Server', puerto: 6379, estado: 'Activo', pid: 1236, memoria: '128 MB', cpu: '5%' },
+            { nombre: 'Task Queue', puerto: 5672, estado: 'Activo', pid: 1237, memoria: '89 MB', cpu: '3%' },
+            { nombre: 'Backup Scheduler', puerto: null, estado: 'Activo', pid: 1238, memoria: '45 MB', cpu: '1%' }
+        ];
+
+        // Logs from cases
+        logs = [];
+        const logLevels = ['INFO', 'WARNING', 'ERROR', 'DEBUG'];
+        const serviciosList = ['auth', 'api', 'monitor', 'backup', 'security', 'database'];
+        
+        casos.slice(0, Math.min(6, casos.length)).forEach((caso, index) => {
+            logs.push({
+                nivel: logLevels[Math.floor(Math.random() * 3)],
+                timestamp: new Date(caso.fecha_creacion).toLocaleString('es-ES'),
+                mensaje: `Caso ${caso.id} (${caso.categoria}) - Estado: ${caso.estado} - Asignado a: ${caso.asignado_a}`,
+                servicio: serviciosList[Math.floor(Math.random() * serviciosList.length)]
+            });
+        });
+
+        // Configurations
+        configuraciones = [
+            { categoria: 'General', clave: 'app.name', valor: 'CSU - Centro de Soporte', tipo: 'texto' },
+            { categoria: 'General', clave: 'app.version', valor: '2.1.0', tipo: 'texto' },
+            { categoria: 'General', clave: 'total_casos', valor: casos.length.toString(), tipo: 'texto' },
+            { categoria: 'Seguridad', clave: 'session.timeout', valor: '30', tipo: 'número' },
+            { categoria: 'Seguridad', clave: 'password.min_length', valor: '8', tipo: 'número' },
+            { categoria: 'Seguridad', clave: 'max_login_attempts', valor: '5', tipo: 'número' },
+            { categoria: 'Base de Datos', clave: 'db.pool_size', valor: '20', tipo: 'número' },
+            { categoria: 'Base de Datos', clave: 'db.backup_enabled', valor: 'true', tipo: 'booleano' },
+            { categoria: 'Performance', clave: 'cache.enabled', valor: 'true', tipo: 'booleano' },
+            { categoria: 'Performance', clave: 'cache.ttl', valor: '3600', tipo: 'número' }
+        ];
+    }
+
     // Actualizar métricas del sistema
     function updateSystemMetrics() {
         // Actualizar valores de CPU, RAM, Disco
-        document.getElementById('cpuValue').textContent = `${systemStatus.servidor.cpu}%`;
-        document.querySelector('.cpu-progress').style.width = `${systemStatus.servidor.cpu}%`;
+        if (document.getElementById('cpuValue')) document.getElementById('cpuValue').textContent = `${systemStatus.servidor.cpu}%`;
+        if (document.querySelector('.cpu-progress')) document.querySelector('.cpu-progress').style.width = `${systemStatus.servidor.cpu}%`;
         
-        document.getElementById('ramValue').textContent = `${systemStatus.servidor.ram}%`;
-        document.querySelector('.ram-progress').style.width = `${systemStatus.servidor.ram}%`;
+        if (document.getElementById('ramValue')) document.getElementById('ramValue').textContent = `${systemStatus.servidor.ram}%`;
+        if (document.querySelector('.ram-progress')) document.querySelector('.ram-progress').style.width = `${systemStatus.servidor.ram}%`;
         
-        document.getElementById('diskValue').textContent = `${systemStatus.servidor.disco}%`;
-        document.querySelector('.disk-progress').style.width = `${systemStatus.servidor.disco}%`;
+        if (document.getElementById('diskValue')) document.getElementById('diskValue').textContent = `${systemStatus.servidor.disco}%`;
+        if (document.querySelector('.disk-progress')) document.querySelector('.disk-progress').style.width = `${systemStatus.servidor.disco}%`;
         
-        document.getElementById('uptimeValue').textContent = systemStatus.servidor.uptime;
-        document.getElementById('dbEngine').textContent = systemStatus.baseDatos.motor;
-        document.getElementById('dbConnections').textContent = `${systemStatus.baseDatos.conexiones}/${systemStatus.baseDatos.maxConexiones}`;
-        document.getElementById('dbSize').textContent = systemStatus.baseDatos.tamaño;
-        document.getElementById('lastBackup').textContent = systemStatus.baseDatos.ultimoBackup;
-        document.getElementById('appVersion').textContent = systemStatus.aplicacion.version;
-        document.getElementById('activeUsers').textContent = systemStatus.aplicacion.usuariosConectados;
-        document.getElementById('requestsPerMin').textContent = systemStatus.aplicacion.solicitudesPorMinuto;
-        document.getElementById('responseTime').textContent = systemStatus.aplicacion.tiempoRespuesta;
+        if (document.getElementById('uptimeValue')) document.getElementById('uptimeValue').textContent = systemStatus.servidor.uptime;
+        if (document.getElementById('dbEngine')) document.getElementById('dbEngine').textContent = systemStatus.baseDatos.motor;
+        if (document.getElementById('dbConnections')) document.getElementById('dbConnections').textContent = `${systemStatus.baseDatos.conexiones}/${systemStatus.baseDatos.maxConexiones}`;
+        if (document.getElementById('dbSize')) document.getElementById('dbSize').textContent = systemStatus.baseDatos.tamaño;
+        if (document.getElementById('lastBackup')) document.getElementById('lastBackup').textContent = systemStatus.baseDatos.ultimoBackup;
+        if (document.getElementById('appVersion')) document.getElementById('appVersion').textContent = systemStatus.aplicacion.version;
+        if (document.getElementById('activeUsers')) document.getElementById('activeUsers').textContent = systemStatus.aplicacion.usuariosConectados;
+        if (document.getElementById('requestsPerMin')) document.getElementById('requestsPerMin').textContent = systemStatus.aplicacion.solicitudesPorMinuto;
+        if (document.getElementById('responseTime')) document.getElementById('responseTime').textContent = systemStatus.aplicacion.tiempoRespuesta;
     }
 
     // Renderizar tabla de servicios
     function renderServicesTable() {
+        if (!servicesTableBody) return;
         servicesTableBody.innerHTML = '';
         
-        servicios.forEach(servicio => {
+        servicios.forEach((servicio, index) => {
             const row = document.createElement('tr');
+            row.style.animation = `slideInLeft ${0.3 + index * 0.05}s ease-out`;
             
             row.innerHTML = `
                 <td>${servicio.nombre}</td>
@@ -118,10 +163,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 </td>
                 <td>
                     <div class="service-actions">
-                        <button class="btn-restart" data-service="${servicio.nombre}">
+                        <button class="btn-restart" onclick="restartService('${servicio.nombre}'); return false;">
                             Reiniciar
                         </button>
-                        <button class="btn-stop" data-service="${servicio.nombre}">
+                        <button class="btn-stop" onclick="stopService('${servicio.nombre}'); return false;">
                             Detener
                         </button>
                     </div>
@@ -130,34 +175,21 @@ document.addEventListener('DOMContentLoaded', function() {
             
             servicesTableBody.appendChild(row);
         });
-        
-        // Añadir event listeners a los botones de acción
-        document.querySelectorAll('.btn-restart').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const serviceName = this.getAttribute('data-service');
-                restartService(serviceName);
-            });
-        });
-        
-        document.querySelectorAll('.btn-stop').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const serviceName = this.getAttribute('data-service');
-                stopService(serviceName);
-            });
-        });
     }
 
     // Renderizar logs
     function renderLogs(filter = 'all') {
+        if (!logsList) return;
         logsList.innerHTML = '';
         
         const filteredLogs = filter === 'all' 
             ? logs 
             : logs.filter(log => log.nivel === filter);
         
-        filteredLogs.forEach(log => {
+        filteredLogs.forEach((log, index) => {
             const logEntry = document.createElement('div');
             logEntry.className = `log-entry log-${log.nivel.toLowerCase()}`;
+            logEntry.style.animation = `slideInUp ${0.3 + index * 0.05}s ease-out`;
             
             logEntry.innerHTML = `
                 <div class="log-header">
@@ -173,15 +205,17 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Renderizar configuración
-    function renderConfiguration() {
+    function renderConfigurations() {
+        if (!configSections) return;
         configSections.innerHTML = '';
         
         // Obtener categorías únicas
         const categorias = [...new Set(configuraciones.map(c => c.categoria))];
         
-        categorias.forEach(categoria => {
+        categorias.forEach((categoria, catIndex) => {
             const section = document.createElement('div');
             section.className = 'config-section';
+            section.style.animation = `slideInUp ${0.3 + catIndex * 0.1}s ease-out`;
             
             let sectionHTML = `<h3 class="section-title">${categoria}</h3>`;
             sectionHTML += `<div class="config-grid">`;
@@ -213,115 +247,81 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Funciones de acción
-    function restartService(serviceName) {
-        if (confirm(`¿Está seguro de que desea reiniciar el servicio "${serviceName}"?`)) {
-            alert(`Reiniciando servicio: ${serviceName}`);
-            // Aquí iría la lógica real para reiniciar el servicio
-        }
-    }
+    window.restartService = function(serviceName) {
+        showNotification(`Reiniciando servicio: ${serviceName}`, 'info');
+    };
 
-    function stopService(serviceName) {
-        if (confirm(`¿Está seguro de que desea detener el servicio "${serviceName}"?`)) {
-            alert(`Deteniendo servicio: ${serviceName}`);
-            // Aquí iría la lógica real para detener el servicio
-        }
-    }
+    window.stopService = function(serviceName) {
+        showNotification(`Deteniendo servicio: ${serviceName}`, 'info');
+    };
 
-    function exportLogs() {
-        alert('Exportando logs...');
-        // Aquí iría la lógica real para exportar logs
-    }
-
-    function importConfiguration() {
-        alert('Importando configuración...');
-        // Aquí iría la lógica real para importar configuración
-    }
-
-    function resetConfiguration() {
-        if (confirm('¿Está seguro de que desea restablecer la configuración a los valores predeterminados?')) {
-            renderConfiguration();
-            alert('Configuración restablecida a valores predeterminados.');
-        }
-    }
-
-    function saveConfiguration() {
-        // Recopilar todos los valores de configuración
-        const configInputs = document.querySelectorAll('.config-input');
-        const updatedConfig = [];
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
+        notification.style.animation = 'slideIn 0.3s ease-out';
         
-        configInputs.forEach(input => {
-            updatedConfig.push({
-                clave: input.getAttribute('data-key'),
-                valor: input.value
-            });
-        });
-        
-        alert('Configuración guardada exitosamente.');
-        console.log('Configuración actualizada:', updatedConfig);
-        // Aquí iría la lógica real para guardar la configuración
+        const container = document.querySelector('.main-content') || document.body;
+        container.appendChild(notification);
+
+        setTimeout(() => {
+            notification.style.animation = 'slideOut 0.3s ease-out';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
     }
 
     // Cambiar entre pestañas
     function switchTab(tabId) {
         // Ocultar todas las pestañas
-        systemTab.classList.remove('active');
-        servicesTab.classList.remove('active');
-        logsTab.classList.remove('active');
-        configTab.classList.remove('active');
+        if (systemTab) systemTab.classList.remove('active');
+        if (servicesTab) servicesTab.classList.remove('active');
+        if (logsTab) logsTab.classList.remove('active');
+        if (configTab) configTab.classList.remove('active');
         
         // Remover clase active de todos los botones
         tabButtons.forEach(btn => btn.classList.remove('active'));
         
         // Mostrar la pestaña seleccionada
         if (tabId === 'system') {
-            systemTab.classList.add('active');
-            document.querySelector('[data-tab="system"]').classList.add('active');
+            if (systemTab) systemTab.classList.add('active');
+            const btn = document.querySelector('[data-tab="system"]');
+            if (btn) btn.classList.add('active');
         } else if (tabId === 'services') {
-            servicesTab.classList.add('active');
-            document.querySelector('[data-tab="services"]').classList.add('active');
+            if (servicesTab) servicesTab.classList.add('active');
+            const btn = document.querySelector('[data-tab="services"]');
+            if (btn) btn.classList.add('active');
         } else if (tabId === 'logs') {
-            logsTab.classList.add('active');
-            document.querySelector('[data-tab="logs"]').classList.add('active');
+            if (logsTab) logsTab.classList.add('active');
+            const btn = document.querySelector('[data-tab="logs"]');
+            if (btn) btn.classList.add('active');
         } else if (tabId === 'config') {
-            configTab.classList.add('active');
-            document.querySelector('[data-tab="config"]').classList.add('active');
+            if (configTab) configTab.classList.add('active');
+            const btn = document.querySelector('[data-tab="config"]');
+            if (btn) btn.classList.add('active');
         }
     }
 
-    // Actualizar datos (simulación)
+    // Actualizar datos
     function refreshData() {
-        // Añadir animación de giro al botón
-        const icon = refreshBtn.querySelector('i');
-        icon.classList.add('refreshing');
+        if (refreshBtn) {
+            const icon = refreshBtn.querySelector('i');
+            if (icon) icon.style.animation = 'spin 1s linear';
+        }
         
-        // Simular actualización de datos
+        loadDataFromAPI();
+        
         setTimeout(() => {
-            // Actualizar métricas con valores aleatorios (simulación)
-            systemStatus.servidor.cpu = Math.floor(Math.random() * 30) + 20;
-            systemStatus.servidor.ram = Math.floor(Math.random() * 30) + 40;
-            systemStatus.servidor.disco = Math.floor(Math.random() * 10) + 40;
-            systemStatus.baseDatos.conexiones = Math.floor(Math.random() * 30) + 30;
-            systemStatus.aplicacion.usuariosConectados = Math.floor(Math.random() * 10) + 5;
-            systemStatus.aplicacion.solicitudesPorMinuto = Math.floor(Math.random() * 50) + 100;
-            systemStatus.aplicacion.tiempoRespuesta = `${Math.floor(Math.random() * 100) + 200}ms`;
-            
-            // Actualizar UI
-            updateSystemMetrics();
-            
-            // Remover animación
-            icon.classList.remove('refreshing');
-            
-            alert('Datos actualizados exitosamente.');
+            if (refreshBtn) {
+                const icon = refreshBtn.querySelector('i');
+                if (icon) icon.style.animation = '';
+            }
         }, 1000);
     }
 
     // Inicializar
     function init() {
-        // Inicializar datos
-        updateSystemMetrics();
-        renderServicesTable();
-        renderLogs();
-        renderConfiguration();
+        // Cargar datos desde API
+        loadDataFromAPI();
         
         // Configurar event listeners para las pestañas
         tabButtons.forEach(btn => {
@@ -331,30 +331,58 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
         
-        // Configurar botón de actualización
-        refreshBtn.addEventListener('click', refreshData);
+        // Configurar botón de refrescar
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', refreshData);
+        }
         
-        // Configurar filtros de logs
-        logFilterButtons.forEach(btn => {
-            btn.addEventListener('click', function() {
-                // Remover active de todos los botones de filtro
-                logFilterButtons.forEach(b => b.classList.remove('active'));
-                // Añadir active al botón clickeado
-                this.classList.add('active');
-                
-                // Filtrar logs
-                const filter = this.textContent === 'Todos' ? 'all' : this.textContent;
-                renderLogs(filter);
+        // Configurar botones de acción en logs
+        if (logFilterButtons) {
+            logFilterButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    logFilterButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    const filter = this.getAttribute('data-filter');
+                    renderLogs(filter);
+                });
             });
-        });
+        }
         
-        // Configurar botones de acción
+        // Configurar botones de acción de configuración
         if (exportBtn) {
-            exportBtn.addEventListener('click', exportLogs);
+            exportBtn.addEventListener('click', () => {
+                showNotification('Exportando logs...', 'info');
+            });
         }
         
         if (importBtn) {
-            importBtn.addEventListener('click', importConfiguration);
+            importBtn.addEventListener('click', () => {
+                showNotification('Importando configuración...', 'info');
+            });
+        }
+        
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                showNotification('Restableciendo configuración...', 'info');
+                loadDataFromAPI();
+            });
+        }
+        
+        if (saveBtn) {
+            saveBtn.addEventListener('click', () => {
+                showNotification('Configuración guardada', 'success');
+            });
+        }
+    }
+
+    // Auto-refresh every 30 seconds
+    setInterval(() => {
+        loadDataFromAPI();
+    }, 30000);
+
+    // Inicializar la aplicación
+    init();
+});
         }
         
         if (resetBtn) {

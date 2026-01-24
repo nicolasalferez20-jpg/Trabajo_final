@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Cargar Casos</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .error { color: red; }
+        .success { color: green; }
+        .loading { color: orange; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Test - Cargar Casos desde API</h1>
+        
+        <div id="status" class="loading">Cargando...</div>
+        <div id="count"></div>
+        
+        <table id="casosTable" style="display:none;">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Cliente</th>
+                    <th>Categoría</th>
+                    <th>Estado</th>
+                    <th>Descripción</th>
+                    <th>Fecha</th>
+                </tr>
+            </thead>
+            <tbody id="casosBody"></tbody>
+        </table>
+    </div>
+
+    <script>
+        const getApiUrl = () => 'http://localhost:3001';
+        
+        async function loadCasos() {
+            try {
+                const response = await fetch(getApiUrl() + '?action=get_casos_simple');
+                
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                const statusDiv = document.getElementById('status');
+                const countDiv = document.getElementById('count');
+                const table = document.getElementById('casosTable');
+                const tbody = document.getElementById('casosBody');
+                
+                if (!data || data.length === 0) {
+                    statusDiv.className = 'error';
+                    statusDiv.textContent = 'No se encontraron casos en la base de datos.';
+                    return;
+                }
+                
+                statusDiv.className = 'success';
+                statusDiv.textContent = '✓ Casos cargados correctamente!';
+                countDiv.textContent = `Total de casos: ${data.length}`;
+                
+                data.forEach((caso, index) => {
+                    const row = tbody.insertRow();
+                    row.innerHTML = `
+                        <td>#${caso.id || 'N/A'}</td>
+                        <td>${caso.cliente || 'N/A'}</td>
+                        <td>${caso.categoria || 'N/A'}</td>
+                        <td>${caso.estado || 'N/A'}</td>
+                        <td>${(caso.descripcion || 'N/A').substring(0, 50)}...</td>
+                        <td>${caso.fecha_creacion ? new Date(caso.fecha_creacion).toLocaleDateString() : 'N/A'}</td>
+                    `;
+                    if (index >= 9) return; // Mostrar solo primeros 10
+                });
+                
+                table.style.display = 'table';
+                
+            } catch (error) {
+                const statusDiv = document.getElementById('status');
+                statusDiv.className = 'error';
+                statusDiv.textContent = `❌ Error: ${error.message}`;
+                console.error('Error completo:', error);
+            }
+        }
+        
+        // Cargar casos al abrir la página
+        loadCasos();
+    </script>
+</body>
+</html>
