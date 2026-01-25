@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Colores por prioridad
   const prioridadMeta = {
-    'critica': { clase: 'critica', color: '#b91c1c', label: 'Crítica' },
+    'critica': { clase: 'critica', color: '#b91c1c', label: 'CrÃ­tica' },
     'urgente': { clase: 'critica', color: '#b91c1c', label: 'Urgente' },
     'alta': { clase: 'alta', color: '#f97316', label: 'Alta' },
     'media': { clase: 'media', color: '#facc15', label: 'Media' },
@@ -48,12 +48,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const loginPath = resolveLoginPath();
   $$('.logout-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      alert('Sesión cerrada.');
+      alert('SesiÃ³n cerrada.');
       window.location.href = loginPath;
     });
   });
 
-  // Estilos rápidos para el menú contextual y modales
+
+  // Estilos rÃ¡pidos para el menÃº contextual y modales
   (function injectCaseMenuStyles() {
     if (document.getElementById('case-menu-styles')) return;
     const style = document.createElement('style');
@@ -84,13 +85,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const empresasBogota = [
     'Ecopetrol', 'Bancolombia', 'Davivienda', 'Avianca', 'Claro Colombia',
-    'Movistar Colombia', 'ETB', 'Tigo Une', 'Grupo Éxito', 'Postobón',
-    'Alpina', 'Nutresa', 'Carvajal', 'Compensar', 'Sura', 'Seguros Bolívar'
+    'Movistar Colombia', 'ETB', 'Tigo Une', 'Grupo Ã‰xito', 'PostobÃ³n',
+    'Alpina', 'Nutresa', 'Carvajal', 'Compensar', 'Sura', 'Seguros BolÃ­var'
   ];
 
-  // API siempre usa servidor Node.js en localhost:3001
+  // API base (local: http://localhost:3001/api, producciÃ³n: {origin}/api, file:// -> localhost)
   const getApiUrl = () => {
-    return 'http://localhost:3001';
+    const host = window.location.hostname;
+    const port = window.location.port ? `:${window.location.port}` : '';
+    const isLocal = host === 'localhost' || host === '127.0.0.1' || host === '';
+    if (isLocal) return 'http://localhost:3001/api';
+    return `${window.location.protocol}//${host}${port}/api`;
   };
 
   // =====================
@@ -109,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
           } catch (e) {
             return [];
           }
-        });
+
       })
       .then(notifications => {
         const unreadOrUrgent = notifications.filter(n => !n.leido || n.tipo === 'urgente');
@@ -125,7 +130,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   */
 
-  // Actualizar badge al cargar la página
+  // Cierre de la funciÃ³n de badge (bloque comentado arriba)
+  }
+
+  // Actualizar badge al cargar la pÃ¡gina
   updateBadgeWithUnreadUrgent();
   // Actualizar cada 30 segundos
   setInterval(updateBadgeWithUnreadUrgent, 30000);
@@ -142,45 +150,45 @@ document.addEventListener('DOMContentLoaded', () => {
            window.location.pathname.includes('Clientes');
   };
 
-  // Interceptar enlaces del menú (excepto Inicio si existe)
+  // Interceptar enlaces del menÃº (excepto Inicio si existe)
   $$('.menu-list a').forEach(a => {
     if (a.id === 'link-inicio' || a.getAttribute('href').includes('Menu principal.html')) return; // dejar navegar
 
     const inSubfolder = isInSubfolder();
 
-    // Permitir navegación a Notificaciones
+    // Permitir navegaciÃ³n a Notificaciones
     if (a.textContent.includes('Notificaciones') || a.querySelector('.badge')) {
       a.href = inSubfolder ? '../notificaciones/Menu - Notificaciones.html' : 'notificaciones/Menu - Notificaciones.html';
       return;
     }
 
-    // Permitir navegación a Estadísticas
-    if (a.textContent.includes('Estadísticas') || a.textContent.includes('Estadisticas')) {
+    // Permitir navegaciÃ³n a EstadÃ­sticas
+    if (a.textContent.includes('EstadÃ­sticas') || a.textContent.includes('Estadisticas')) {
       a.href = inSubfolder ? '../estadisticas/Menu - Estadisticas.html' : 'estadisticas/Menu - Estadisticas.html';
       return;
     }
 
-    // Permitir navegación a Reportes
+    // Permitir navegaciÃ³n a Reportes
     if (a.textContent.includes('Reportes')) {
       a.href = inSubfolder ? '../reportes/Menu - Reportes.html' : 'reportes/Menu - Reportes.html';
       return;
     }
 
-    // Permitir navegación a Herramientas
+    // Permitir navegaciÃ³n a Herramientas
     if (a.textContent.includes('Herramientas')) {
       a.href = inSubfolder ? '../herramientas/Menu - Herramientas.html' : 'herramientas/Menu - Herramientas.html';
       return;
     }
 
-    // Permitir navegación a Configuración
-    if (a.textContent.includes('Configuración') || a.textContent.includes('Configuracion')) {
+    // Permitir navegaciÃ³n a ConfiguraciÃ³n
+    if (a.textContent.includes('ConfiguraciÃ³n') || a.textContent.includes('Configuracion')) {
       a.href = inSubfolder ? '../configuracion/Menu - Configuracion.html' : 'configuracion/Menu - Configuracion.html';
       return;
     }
   });
 
   // =====================
-  // Menú de perfil
+  // MenÃº de perfil
   // =====================
   const profileBtn = $('.profile-menu-btn');
   const profileMenu = $('.profile-menu');
@@ -189,11 +197,12 @@ document.addEventListener('DOMContentLoaded', () => {
       e.stopPropagation();
       profileMenu.style.display = (profileMenu.style.display === 'block') ? 'none' : 'block';
     });
+
     document.addEventListener('click', () => { if (profileMenu.style.display === 'block') profileMenu.style.display = 'none'; });
   }
 
   // =====================
-  // Página: Menú principal
+  // PÃ¡gina: MenÃº principal
   // =====================
   const btnNuevoCaso = document.getElementById('btn-nuevo-caso');
   if (btnNuevoCaso) {
@@ -211,8 +220,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =====================
-  // Página: Creación de Casos 
-  // NOTA: Los handlers completos están implementados más abajo (línea 553+)
+  // PÃ¡gina: CreaciÃ³n de Casos 
+  // NOTA: Los handlers completos estÃ¡n implementados mÃ¡s abajo (lÃ­nea 553+)
   // =====================
 
   // =====================
@@ -240,7 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const caret = document.createElement('span');
     caret.className = 'cs-caret';
-    caret.textContent = '▾';
+    caret.textContent = 'â–¾';
 
     trigger.append(valueSpan, caret);
 
@@ -288,7 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
   })();
 
   // =====================
-  // Resumen dinámico + ID
+  // Resumen dinÃ¡mico + ID
   // =====================
   (function summaryBindings() {
     const idEl = document.getElementById('summary-id');
@@ -314,15 +323,15 @@ document.addEventListener('DOMContentLoaded', () => {
         .catch(err => console.error(err));
     }
 
-    const updateCliente = () => { if (sCliente) sCliente.textContent = inputCliente && inputCliente.value ? inputCliente.value : '—'; };
+    const updateCliente = () => { if (sCliente) sCliente.textContent = inputCliente && inputCliente.value ? inputCliente.value : 'â€”'; };
     const updateCategoria = () => {
       if (!sCategoria) return;
       const opt = selectCategoria && selectCategoria.selectedOptions && selectCategoria.selectedOptions[0];
-      sCategoria.textContent = opt ? opt.textContent.toUpperCase() : '—';
+      sCategoria.textContent = opt ? opt.textContent.toUpperCase() : 'â€”';
     };
     const updatePrioridad = () => {
       if (!sPrioridad) return;
-      const val = selectPrioridad ? (selectPrioridad.value || selectPrioridad.options[selectPrioridad.selectedIndex]?.text) : '—';
+      const val = selectPrioridad ? (selectPrioridad.value || selectPrioridad.options[selectPrioridad.selectedIndex]?.text) : 'â€”';
       sPrioridad.textContent = val;
       const low = String(val).toLowerCase();
       sPrioridad.className = 'pill ' + (low === 'alta' ? 'green' : 'gray');
@@ -344,7 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
   })();
 
   // =====================
-  // Carga de Datos para Panel de Métricas (Menu principal)
+  // Carga de Datos para Panel de MÃ©tricas (Menu principal)
   // =====================
   (function loadMetricsPanel() {
     const metricCreados = document.getElementById('metric-creados');
@@ -352,43 +361,43 @@ document.addEventListener('DOMContentLoaded', () => {
     const metricSolucionados = document.getElementById('metric-solucionados');
     const metricCerrados = document.getElementById('metric-cerrados');
 
-    // Si no existen estos elementos, no estamos en el menú principal
+    // Si no existen estos elementos, no estamos en el menÃº principal
     if (!metricCreados) return;
 
-    // Cargar estadísticas desde la API
+    // Cargar estadÃ­sticas desde la API
     fetch(getApiUrl() + '?action=get_dashboard_stats')
       .then(res => res.json())
       .then(data => {
-        // Actualizar los valores de las métricas
+        // Actualizar los valores de las mÃ©tricas
         if (metricCreados) metricCreados.textContent = (data.total_casos || 0).toLocaleString('es-CO');
         if (metricPausados) metricPausados.textContent = (data.pausados || 0).toLocaleString('es-CO');
         if (metricSolucionados) metricSolucionados.textContent = (data.resueltos || 0).toLocaleString('es-CO');
         if (metricCerrados) metricCerrados.textContent = (data.cerrados || 0).toLocaleString('es-CO');
       })
       .catch(err => {
-        console.error('Error cargando métricas:', err);
+        console.error('Error cargando mÃ©tricas:', err);
         // Mantener valores en 0 en caso de error
       });
   })();
 
   // =====================
-  // Carga de Datos para Reportes (Si estamos en la página de reportes)
+  // Carga de Datos para Reportes (Si estamos en la pÃ¡gina de reportes)
   // =====================
   (function loadReportsData() {
     const kpiGenerados = document.getElementById('kpi-generados');
     const kpiUsuarios = document.getElementById('kpi-usuarios');
     const listRecent = document.getElementById('recentReports');
 
-    // Si no existen estos elementos, no estamos en la página de reportes
+    // Si no existen estos elementos, no estamos en la pÃ¡gina de reportes
     if (!kpiGenerados && !listRecent) return;
 
-    // Cargar Estadísticas
+    // Cargar EstadÃ­sticas
     fetch(getApiUrl() + '?action=get_dashboard_stats')
       .then(res => res.json())
       .then(data => {
         if (kpiGenerados) kpiGenerados.innerHTML = `<strong>${data.reportes_generados || 0}</strong>`;
         if (kpiUsuarios) kpiUsuarios.innerHTML = `<strong>${data.usuarios_activos || 0}</strong>`;
-        // Puedes agregar más KPIs aquí
+        // Puedes agregar mÃ¡s KPIs aquÃ­
       })
       .catch(err => console.error('Error cargando stats:', err));
 
@@ -403,26 +412,28 @@ document.addEventListener('DOMContentLoaded', () => {
             li.className = 'report-item';
             li.innerHTML = `
               <div class="left">
-                <div class="r-icon">📄</div>
+                <div class="r-icon">ðŸ“„</div>
                 <div class="r-info">
                   <div class="r-title">Caso #${rep.id} - ${rep.cliente}</div>
-                  <div class="r-meta">${rep.fecha_creacion} • ${rep.categoria}</div>
+                  <div class="r-meta">${rep.fecha_creacion} â€¢ ${rep.categoria}</div>
                 </div>
               </div>
-              <div class="r-actions">🔽</div>
+              <div class="r-actions">ðŸ”½</div>
             `;
             listRecent.appendChild(li);
           });
-        });
+        })
+        .catch(err => console.error('Error cargando reports:', err));
     }
+
   })();
 
   // =====================
-  // Paginación de Tabla de Casos (Menu principal.html)
+  // PaginaciÃ³n de Tabla de Casos (Menu principal.html)
   // =====================
   (function initCasesPagination() {
     if (casesPaginationInitialized) return;
-    if (casesPaginationInitialized) return; // evitar doble inicialización
+    if (casesPaginationInitialized) return; // evitar doble inicializaciÃ³n
     casesPaginationInitialized = true;
 
     const tbody = document.getElementById('cases-table-body');
@@ -432,7 +443,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (!tbody || !pagerContainer) return;
 
-    const itemsPerPage = 12; // 12 casos por página
+    const itemsPerPage = 12; // 12 casos por pÃ¡gina
     let allCases = [];
     let currentPage = 1;
     let contextMenu;
@@ -454,6 +465,7 @@ document.addEventListener('DOMContentLoaded', () => {
           contextMenu.style.display = 'none';
         }
       });
+
       return contextMenu;
     }
 
@@ -473,6 +485,132 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function closeMenu() {
       if (contextMenu) contextMenu.style.display = 'none';
+    }
+
+    function openCaseDetailModal(caseData) {
+      if (!caseData) return;
+      
+      let overlay = document.getElementById('case-detail-modal-overlay');
+      if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'case-detail-modal-overlay';
+        overlay.className = 'case-modal-overlay';
+        document.body.appendChild(overlay);
+      }
+
+      const estadoLower = (caseData.estado || '').toLowerCase();
+      const estadoInfo = estadoMeta[estadoLower] || { clase: 'abierto', etiqueta: caseData.estado || 'Abierto', color: '#16a34a' };
+      
+      const prioridadLower = (caseData.prioridad || 'media').toLowerCase();
+      const prioridadInfo = prioridadMeta[prioridadLower] || prioridadMeta['media'];
+
+      const coloresAvatar = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2'];
+      const hash = (caseData.asignado_a || 'U').charCodeAt(0) % coloresAvatar.length;
+      const colorAvatar = coloresAvatar[hash];
+
+      const fechaFormato = caseData.fecha_creacion 
+        ? new Date(caseData.fecha_creacion).toLocaleDateString('es-ES', { 
+            month: 'long', 
+            day: 'numeric', 
+            year: 'numeric', 
+            hour: '2-digit', 
+            minute: '2-digit' 
+          })
+        : 'N/D';
+
+      overlay.innerHTML = `
+        <div class="case-modal" style="width: min(900px, 90vw); max-height: 90vh; overflow-y: auto;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div>
+              <h2 style="margin: 0; color: #111827;">#${formatCaseId(caseData.id)}</h2>
+              <p style="margin: 5px 0 0 0; color: #7b8694; font-size: 14px;">${fechaFormato}</p>
+            </div>
+            <button onclick="document.getElementById('case-detail-modal-overlay').style.display='none'" style="background: #e5e7eb; border: none; border-radius: 8px; padding: 10px 16px; cursor: pointer; font-weight: 600;">✕ Cerrar</button>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div>
+              <h3 style="margin: 0 0 15px 0; color: #111827; font-size: 16px;">Información General</h3>
+              
+              <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: 700; color: #111827; margin-bottom: 4px;">Cliente</label>
+                <p style="margin: 0; color: #2b3440; background: #f9fafb; padding: 10px; border-radius: 8px;">${caseData.cliente || 'N/D'}</p>
+              </div>
+
+              <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: 700; color: #111827; margin-bottom: 4px;">Categoría</label>
+                <p style="margin: 0; color: #2b3440; background: #f9fafb; padding: 10px; border-radius: 8px;">${caseData.categoria || 'General'}</p>
+              </div>
+
+              <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: 700; color: #111827; margin-bottom: 4px;">Estado</label>
+                <span class="status ${estadoInfo.clase}" style="display: inline-block; color:${estadoInfo.color}; background-color:${estadoInfo.color}22; padding: 8px 12px; border-radius: 8px; font-weight: 600;">${estadoInfo.etiqueta}</span>
+              </div>
+
+              <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: 700; color: #111827; margin-bottom: 4px;">Prioridad</label>
+                <span class="priority ${prioridadInfo.clase}" style="display: inline-block; background-color:${prioridadInfo.color}22; color:${prioridadInfo.color}; padding: 8px 12px; border-radius: 8px; font-weight: 600;">${prioridadInfo.label}</span>
+              </div>
+            </div>
+
+            <div>
+              <h3 style="margin: 0 0 15px 0; color: #111827; font-size: 16px;">Asignación</h3>
+
+              <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: 700; color: #111827; margin-bottom: 4px;">Asignado a</label>
+                <div style="display: flex; align-items: center; background: #f9fafb; padding: 10px; border-radius: 8px;">
+                  <span style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: ${colorAvatar}; color: white; border-radius: 50%; font-weight: 700; margin-right: 10px;">${(caseData.asignado_a || 'U').charAt(0).toUpperCase()}</span>
+                  <span style="color: #2b3440; font-weight: 600;">${caseData.asignado_a || 'Sin asignar'}</span>
+                </div>
+              </div>
+
+              <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: 700; color: #111827; margin-bottom: 4px;">Autor</label>
+                <p style="margin: 0; color: #2b3440; background: #f9fafb; padding: 10px; border-radius: 8px;">${caseData.autor || 'Gestor asignado'}</p>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #ebedf2;">
+            <h3 style="margin: 0 0 15px 0; color: #111827; font-size: 16px;">Descripción</h3>
+            <div style="background: #f9fafb; padding: 15px; border-radius: 8px; color: #2b3440; line-height: 1.6; white-space: pre-wrap;">
+              ${caseData.descripcion || 'Sin descripción disponible'}
+            </div>
+          </div>
+
+          ${caseData.sede ? `
+          <div style="margin-top: 20px; padding: 15px; background: #f0f9ff; border-left: 4px solid #0ea5e9; border-radius: 8px;">
+            <p style="margin: 0; color: #0369a1;"><strong>Sede:</strong> ${caseData.sede}</p>
+          </div>
+          ` : ''}
+
+          ${caseData.contacto || caseData.correo || caseData.telefono ? `
+          <div style="margin-top: 20px;">
+            <h3 style="margin: 0 0 15px 0; color: #111827; font-size: 16px;">Contacto</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+              ${caseData.contacto ? `<div style="background: #f9fafb; padding: 10px; border-radius: 8px;"><strong style="color: #111827;">Contacto:</strong> <p style="margin: 5px 0 0 0; color: #2b3440;">${caseData.contacto}</p></div>` : ''}
+              ${caseData.correo ? `<div style="background: #f9fafb; padding: 10px; border-radius: 8px;"><strong style="color: #111827;">Correo:</strong> <p style="margin: 5px 0 0 0; color: #2b3440;">${caseData.correo}</p></div>` : ''}
+              ${caseData.telefono ? `<div style="background: #f9fafb; padding: 10px; border-radius: 8px;"><strong style="color: #111827;">Teléfono:</strong> <p style="margin: 5px 0 0 0; color: #2b3440;">${caseData.telefono}</p></div>` : ''}
+            </div>
+          </div>
+          ` : ''}
+
+          <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
+            <button onclick="document.getElementById('case-detail-modal-overlay').style.display='none'" style="background: #e5e7eb; color: #111827; border: none; border-radius: 10px; padding: 10px 20px; cursor: pointer; font-weight: 700;">Cerrar</button>
+            <button onclick="openCaseModal('edit', window.currentCaseData)" style="background: #2563eb; color: white; border: none; border-radius: 10px; padding: 10px 20px; cursor: pointer; font-weight: 700;">Editar</button>
+          </div>
+        </div>
+      `;
+
+      window.currentCaseData = caseData;
+      overlay.style.display = 'flex';
+      
+      // Cerrar al hacer clic fuera del modal
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          overlay.style.display = 'none';
+        }
+      });
     }
 
     function openCaseModal(mode, caseData) {
@@ -518,7 +656,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </select>
           </div>
           <div class="field">
-            <label>Descripción</label>
+            <label>DescripciÃ³n</label>
             <textarea id="case-descripcion" ${readOnly ? 'disabled' : ''}>${caseData.descripcion || ''}</textarea>
           </div>
           ${timelineHtml}
@@ -568,7 +706,7 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('Solo el autor puede eliminar este caso');
         return;
       }
-      if (!confirm('¿Seguro que deseas eliminar el caso #' + formatCaseId(caseData.id) + '?')) return;
+      if (!confirm('Â¿Seguro que deseas eliminar el caso #' + formatCaseId(caseData.id) + '?')) return;
       try {
         const resp = await fetch(getApiUrl() + '?action=delete_case', {
           method: 'POST',
@@ -586,7 +724,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // Función para renderizar una página
+    // FunciÃ³n para renderizar una pÃ¡gina
     function renderPage(page) {
       const startIdx = (page - 1) * itemsPerPage;
       const endIdx = startIdx + itemsPerPage;
@@ -595,13 +733,14 @@ document.addEventListener('DOMContentLoaded', () => {
       tbody.innerHTML = '';
 
       if (pageCases.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:20px;">No hay casos en esta página</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:20px;">No hay casos en esta pÃ¡gina</td></tr>';
         return;
       }
 
       pageCases.forEach(c => {
         const tr = document.createElement('tr');
         tr.dataset.caseId = c.id;
+        tr.style.cursor = 'pointer';
         
         // Formatear fecha
         let fechaFormato = c.fecha_creacion;
@@ -642,18 +781,33 @@ document.addEventListener('DOMContentLoaded', () => {
           <td><small>${autorNombre}</small></td>
           <td class="ellipsis">···</td>
         `;
+        
+        // Evento para abrir modal al hacer clic en la fila
+        tr.addEventListener('click', (e) => {
+          if (e.target.type !== 'checkbox') {
+            openCaseDetailModal(c);
+          }
+        });
+        
+        // Evento para doble clic
+        tr.addEventListener('dblclick', (e) => {
+          e.preventDefault();
+          openCaseDetailModal(c);
+        });
+        
         tbody.appendChild(tr);
+
       });
 
       updatePagerButtons();
     }
 
-    // Actualizar números de página
+    // Actualizar nÃºmeros de pÃ¡gina
     function updatePagerButtons() {
       const totalPages = Math.ceil(allCases.length / itemsPerPage);
       const pages = [];
       
-      // Lógica para mostrar páginas (ej: 1, 2, 3, ..., 8, 9, 10)
+      // LÃ³gica para mostrar pÃ¡ginas (ej: 1, 2, 3, ..., 8, 9, 10)
       if (totalPages <= 7) {
         for (let i = 1; i <= totalPages; i++) pages.push(i);
       } else {
@@ -665,7 +819,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return `<span class="pg ${p === currentPage ? 'active' : ''}" data-page="${p}">${p}</span>`;
       }).join('');
 
-      // Eventos para números de página
+      // Eventos para nÃºmeros de pÃ¡gina
       pagerContainer.querySelectorAll('[data-page]').forEach(el => {
         el.addEventListener('click', () => {
           currentPage = parseInt(el.dataset.page);
@@ -683,8 +837,33 @@ document.addEventListener('DOMContentLoaded', () => {
       nextBtn.style.cursor = currentPage === totalPages ? 'not-allowed' : 'pointer';
     }
 
+    // MenÃº contextual en ellipsis
+    tbody.addEventListener('click', (e) => {
+      const target = e.target.closest('.ellipsis');
+      if (!target) return;
+      const tr = target.closest('tr');
+      const caseId = tr?.dataset.caseId;
+      const caseData = allCases.find(x => String(x.id) === String(caseId));
+      if (!caseData) return;
+      const rect = target.getBoundingClientRect();
+      showCaseMenu(caseData, rect);
+    });
+
+    // Acciones del menÃº
+    document.body.addEventListener('click', (e) => {
+      if (!contextMenu || contextMenu.style.display !== 'block') return;
+      if (e.target.dataset.action === 'view' || e.target.dataset.action === 'edit' || e.target.dataset.action === 'delete') {
+        const caseId = contextMenu.dataset.caseId;
+        const caseData = allCases.find(x => String(x.id) === String(caseId));
+        if (!caseData) return;
+        if (e.target.dataset.action === 'view') openCaseModal('view', caseData);
+        if (e.target.dataset.action === 'edit') openCaseModal('edit', caseData);
+        if (e.target.dataset.action === 'delete') deleteCase(caseData);
+      }
+    });
+
     // Cargar datos
-    fetch(getApiUrl() + '?action=get_casos_simple')
+    fetch(getApiUrl() + '/casos')
       .then(res => {
         if (!res.ok) {
           throw new Error(`Error HTTP: ${res.status}`);
@@ -692,44 +871,20 @@ document.addEventListener('DOMContentLoaded', () => {
         return res.json();
       })
       .then(data => {
-        allCases = data || [];
+        // El API retorna {success: true, data: [], count: n}
+        allCases = (data.data && Array.isArray(data.data)) ? data.data : (data || []);
         
         if (allCases.length === 0) {
           tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:20px;">No hay casos registrados</td></tr>';
           return;
         }
 
-
-      // Menú contextual en ellipsis
-      tbody.addEventListener('click', (e) => {
-        const target = e.target.closest('.ellipsis');
-        if (!target) return;
-        const tr = target.closest('tr');
-        const caseId = tr?.dataset.caseId;
-        const caseData = allCases.find(x => String(x.id) === String(caseId));
-        if (!caseData) return;
-        const rect = target.getBoundingClientRect();
-        showCaseMenu(caseData, rect);
-      });
-
-      // Acciones del menú
-      document.body.addEventListener('click', (e) => {
-        if (!contextMenu || contextMenu.style.display !== 'block') return;
-        if (e.target.dataset.action === 'view' || e.target.dataset.action === 'edit' || e.target.dataset.action === 'delete') {
-          const caseId = contextMenu.dataset.caseId;
-          const caseData = allCases.find(x => String(x.id) === String(caseId));
-          if (!caseData) return;
-          if (e.target.dataset.action === 'view') openCaseModal('view', caseData);
-          if (e.target.dataset.action === 'edit') openCaseModal('edit', caseData);
-          if (e.target.dataset.action === 'delete') deleteCase(caseData);
-        }
-      });
         currentPage = 1;
         renderPage(currentPage);
       })
       .catch(err => {
         console.error('Error cargando tabla:', err);
-        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:20px; color:#dc2626;">Error al cargar casos. Por favor, verifica la conexión.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:20px; color:#dc2626;">Error al cargar casos. Por favor, verifica la conexiÃ³n.</td></tr>';
       });
 
     // Eventos de Previous/Next
@@ -754,7 +909,7 @@ document.addEventListener('DOMContentLoaded', () => {
   })();
 
   // =====================
-  // Auto-actualización de tabla de casos cada 30 segundos
+  // Auto-actualizaciÃ³n de tabla de casos cada 30 segundos
   // =====================
   (function autoRefreshCases() {
     const tbody = document.getElementById('cases-table-body');
@@ -764,7 +919,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let autoRefreshInterval;
     let lastCasesCount = 0;
 
-    // Mostrar indicador de auto-actualización
+    // Mostrar indicador de auto-actualizaciÃ³n
     if (indicator) {
       indicator.style.display = 'flex';
       setTimeout(() => {
@@ -773,23 +928,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function refreshCasesData() {
-      fetch(getApiUrl() + '?action=get_casos_simple')
-        .then(res => res.ok ? res.json() : [])
+      fetch(getApiUrl() + '/casos')
+        .then(res => res.ok ? res.json() : { data: [] })
         .then(data => {
-          if (data && data.length > 0) {
+          const casos = (data.data && Array.isArray(data.data)) ? data.data : (data || []);
+          if (casos && casos.length > 0) {
             // Solo actualizar si hay cambios en la cantidad de casos
-            if (data.length !== lastCasesCount) {
-              console.log(`🔄 Datos actualizados: ${data.length} casos (antes: ${lastCasesCount})`);
-              lastCasesCount = data.length;
-              allCases = data;
+            if (casos.length !== lastCasesCount) {
+              console.log(`ðŸ”„ Datos actualizados: ${casos.length} casos (antes: ${lastCasesCount})`);
+              lastCasesCount = casos.length;
+              allCases = casos;
               
-              // Re-renderizar la página actual
+              // Re-renderizar la pÃ¡gina actual
               if (typeof renderPage === 'function') {
                 renderPage(currentPage);
               }
               
-              // Mostrar notificación sutil
-              showRefreshNotification(data.length);
+              // Mostrar notificaciÃ³n sutil
+              showRefreshNotification(casos.length);
               
               // Animar indicador
               if (indicator) {
@@ -801,11 +957,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
           }
         })
-        .catch(err => console.error('Error en auto-actualización:', err));
+        .catch(err => console.error('Error en auto-actualizaciÃ³n:', err));
     }
 
     function showRefreshNotification(count) {
-      // Crear notificación temporal
+      // Crear notificaciÃ³n temporal
       const notification = document.createElement('div');
       notification.style.cssText = `
         position: fixed;
@@ -820,28 +976,28 @@ document.addEventListener('DOMContentLoaded', () => {
         font-weight: 600;
         animation: slideIn 0.3s ease;
       `;
-      notification.textContent = `✓ ${count} casos actualizados`;
+      notification.textContent = `âœ“ ${count} casos actualizados`;
       document.body.appendChild(notification);
 
-      // Remover después de 3 segundos
+      // Remover despuÃ©s de 3 segundos
       setTimeout(() => {
         notification.style.animation = 'slideOut 0.3s ease';
         setTimeout(() => notification.remove(), 300);
       }, 3000);
     }
 
-    // Iniciar auto-actualización cada 30 segundos
+    // Iniciar auto-actualizaciÃ³n cada 30 segundos
     autoRefreshInterval = setInterval(refreshCasesData, 30000);
-    console.log('✓ Auto-actualización de casos activada (cada 30 segundos)');
+    console.log('âœ“ Auto-actualizaciÃ³n de casos activada (cada 30 segundos)');
 
-    // Limpiar intervalo al salir de la página
+    // Limpiar intervalo al salir de la pÃ¡gina
     window.addEventListener('beforeunload', () => {
       if (autoRefreshInterval) clearInterval(autoRefreshInterval);
     });
   })();
 
   // =====================
-  // Carga de Datos para Estadísticas (Menu - Estadisticas.html)
+  // Carga de Datos para EstadÃ­sticas (Menu - Estadisticas.html)
   // =====================
   (function loadStatsData() {
     const statTotal = document.getElementById('stat-total');
@@ -861,7 +1017,7 @@ document.addEventListener('DOMContentLoaded', () => {
   })();
 
   // =====================
-  // Funcionalidad de Creación de Casos
+  // Funcionalidad de CreaciÃ³n de Casos
   // =====================
   const btnCrearCaso = document.getElementById('btn-crear-caso');
   const btnGuardarBorrador = document.getElementById('btn-guardar-borrador');
@@ -890,7 +1046,7 @@ document.addEventListener('DOMContentLoaded', () => {
         asignado: document.getElementById('asignar')?.value || '',
         prioridad: document.getElementById('prioridad')?.value || '',
         estado: 'Activo',
-        autor: 'Juan Pérez'
+        autor: 'Juan PÃ©rez'
       };
 
       // Validar campos obligatorios
@@ -901,7 +1057,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       
       if (!caseData.categoria) {
-        alert('Por favor seleccione una categoría');
+        alert('Por favor seleccione una categorÃ­a');
         document.getElementById('categoria')?.focus();
         return;
       }
@@ -913,12 +1069,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       
       if (!caseData.descripcion) {
-        alert('Por favor ingrese una descripción de la falla');
+        alert('Por favor ingrese una descripciÃ³n de la falla');
         document.getElementById('descripcion')?.focus();
         return;
       }
 
-      // Deshabilitar botón mientras se procesa
+      // Deshabilitar botÃ³n mientras se procesa
       btnCrearCaso.disabled = true;
       btnCrearCaso.textContent = 'Guardando...';
 
@@ -937,12 +1093,12 @@ document.addEventListener('DOMContentLoaded', () => {
           // Limpiar borrador guardado
           localStorage.removeItem('caso_borrador');
           
-          // Mostrar modal de éxito
+          // Mostrar modal de Ã©xito
           if (modalExito) {
             modalExito.style.display = 'flex';
             setTimeout(() => {
               modalExito.style.display = 'none';
-              // Redirigir al menú principal
+              // Redirigir al menÃº principal
               window.location.href = 'Menu principal.html';
             }, 2000);
           } else {
@@ -956,14 +1112,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       } catch (error) {
         console.error('Error:', error);
-        alert('Error de conexión. Por favor intente nuevamente.');
+        alert('Error de conexiÃ³n. Por favor intente nuevamente.');
         btnCrearCaso.disabled = false;
         btnCrearCaso.textContent = 'Crear Caso';
       }
     });
   }
 
-  // Funcionalidad del botón Cancelar
+  // Funcionalidad del botÃ³n Cancelar
   if (btnCancelar && modalCancelar) {
     btnCancelar.addEventListener('click', () => {
       modalCancelar.style.display = 'flex';
@@ -985,7 +1141,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
   
-  // Funcionalidad del botón Guardar Borrador
+  // Funcionalidad del botÃ³n Guardar Borrador
   if (btnGuardarBorrador) {
     btnGuardarBorrador.addEventListener('click', () => {
       // Guardar en localStorage como borrador
@@ -1016,24 +1172,24 @@ document.addEventListener('DOMContentLoaded', () => {
   // Cargar borrador si existe
   const loadDraft = () => {
     const draft = localStorage.getItem('caso_borrador');
-    if (draft) {
-      const data = JSON.parse(draft);
-      Object.keys(data).forEach(key => {
-        const elem = document.getElementById(key.replace('_', '-'));
-        if (elem && data[key]) {
-          elem.value = data[key];
-        }
-      });
-      
-      if (confirm('Se encontró un borrador guardado. ¿Desea cargarlo?')) {
-        updateSummary();
-      } else {
-        localStorage.removeItem('caso_borrador');
-      }
+    if (!draft) return;
+
+    const data = JSON.parse(draft);
+    if (!confirm('Se encontrÃ³ un borrador guardado. Â¿Desea cargarlo?')) {
+      localStorage.removeItem('caso_borrador');
+      return;
     }
+
+    Object.keys(data).forEach(key => {
+      const elem = document.getElementById(key.replace('_', '-'));
+      if (elem && data[key]) {
+        elem.value = data[key];
+      }
+    });
+    updateSummary();
   };
   
-  // Ejecutar al cargar la página
+  // Ejecutar al cargar la pÃ¡gina
   if (btnCrearCaso) {
     loadDraft();
   }
@@ -1070,7 +1226,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // =====================
-  // Sistema de Filtros Dinámicos
+  // Sistema de Filtros DinÃ¡micos
   // =====================
   (function initFilters() {
     const filterBtn = document.getElementById('btn-filtros');
@@ -1143,238 +1299,75 @@ document.addEventListener('DOMContentLoaded', () => {
       applyFiltersToTable(activeFilters);
       filterModal.style.display = 'none';
       
-      // Mostrar badge si hay filtros activos
       const hasActiveFilters = activeFilters.estados.length > 0 || 
                                activeFilters.prioridades.length > 0 || 
                                activeFilters.categoria || 
                                activeFilters.tecnico;
       filterBtn.classList.toggle('active-filters', hasActiveFilters);
     });
-
-    // Función para aplicar filtros a la tabla
-    window.applyFiltersToTable = function(filters) {
-      const tbody = document.getElementById('cases-table-body');
-      if (!tbody) return;
-
-      const rows = tbody.querySelectorAll('tr');
-      let visibleCount = 0;
-
-      rows.forEach(row => {
-        let showRow = true;
-
-        // Filtro por estado
-        if (filters.estados.length > 0) {
-          const estadoCell = row.querySelector('td:nth-child(4)');
-          const estadoText = estadoCell?.textContent.trim().toLowerCase() || '';
-          const match = filters.estados.some(est => {
-            if (est === 'abierto') return estadoText.includes('activo');
-            if (est === 'en_progreso') return estadoText.includes('progreso');
-            return estadoText.includes(est);
-          });
-          showRow = showRow && match;
-        }
-
-        // Filtro por prioridad
-        if (filters.prioridades.length > 0) {
-          const prioridadCell = row.querySelector('td:nth-child(6)');
-          const prioridadText = prioridadCell?.textContent.trim().toLowerCase() || '';
-          const match = filters.prioridades.some(pri => {
-            if (pri === 'critica' || pri === 'urgente') return prioridadText.includes('urgente') || prioridadText.includes('crítica');
-            return prioridadText.includes(pri);
-          });
-          showRow = showRow && match;
-        }
-
-        // Filtro por categoría
-        if (filters.categoria) {
-          const categoriaCell = row.querySelector('td:nth-child(7)');
-          const categoriaText = categoriaCell?.textContent.trim() || '';
-          showRow = showRow && categoriaText === filters.categoria;
-        }
-
-        // Filtro por técnico asignado
-        if (filters.tecnico) {
-          const tecnicoCell = row.querySelector('td:nth-child(5)');
-          const tecnicoText = tecnicoCell?.textContent.trim() || '';
-          showRow = showRow && tecnicoText.includes(filters.tecnico);
-        }
-
-        row.style.display = showRow ? '' : 'none';
-        if (showRow) visibleCount++;
-      });
-
-      // Si no hay resultados
-      if (visibleCount === 0 && tbody.querySelectorAll('tr[style=""]').length === 0) {
-        const noResultsRow = tbody.querySelector('tr[style*="display: none"]');
-        if (!noResultsRow || tbody.querySelectorAll('tr').length === 1) {
-          tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:20px; color:#6b7280;">No hay casos que coincidan con los filtros seleccionados</td></tr>';
-        }
-      }
-    };
   })();
 
-  // =====================
-  // Paginación de Tabla de Casos (Menu principal.html)
-  // =====================
-  (function initCasesPagination() {
+  // FunciÃ³n para aplicar filtros a la tabla
+  window.applyFiltersToTable = function(filters) {
     const tbody = document.getElementById('cases-table-body');
-    const pagerContainer = document.querySelector('.pager');
-    const prevBtn = document.querySelector('.table-footer .filters-btn:first-of-type');
-    const nextBtn = document.querySelector('.table-footer .filters-btn:last-of-type');
-    
-    if (!tbody || !pagerContainer) return;
+    if (!tbody) return;
 
-    const itemsPerPage = 12; // 12 casos por página
-    let allCases = [];
-    let currentPage = 1;
+    const rows = tbody.querySelectorAll('tr');
+    let visibleCount = 0;
 
-    // Función para renderizar una página
-    function renderPage(page) {
-      const startIdx = (page - 1) * itemsPerPage;
-      const endIdx = startIdx + itemsPerPage;
-      const pageCases = allCases.slice(startIdx, endIdx);
+    rows.forEach(row => {
+      let showRow = true;
 
-      tbody.innerHTML = '';
-
-      if (pageCases.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:20px;">No hay casos en esta página</td></tr>';
-        return;
-      }
-
-      pageCases.forEach(c => {
-        const tr = document.createElement('tr');
-        
-        // Formatear fecha
-        let fechaFormato = c.fecha_creacion;
-        if (c.fecha_creacion) {
-          const fecha = new Date(c.fecha_creacion);
-          const opciones = { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' };
-          fechaFormato = fecha.toLocaleDateString('es-ES', opciones);
-        }
-        
-        const estadoLower = (c.estado || '').toLowerCase();
-        const estadoInfo = estadoMeta[estadoLower] || { clase: 'abierto', etiqueta: c.estado || 'Abierto', color: '#16a34a' };
-        
-        const prioridadLower = (c.prioridad || 'media').toLowerCase();
-        const prioridadInfo = prioridadMeta[prioridadLower] || prioridadMeta['media'];
-
-        const clienteNombre = c.cliente || empresasBogota[Math.floor(Math.random() * empresasBogota.length)];
-        const autorNombre = c.autor || 'Gestor asignado';
-        
-        // Color avatar
-        const coloresAvatar = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2'];
-        const hash = (c.asignado_a || 'U').charCodeAt(0) % coloresAvatar.length;
-        const colorAvatar = coloresAvatar[hash];
-        
-        tr.innerHTML = `
-          <td class="td-check"><input type="checkbox"></td>
-          <td><strong>#${formatCaseId(c.id)}</strong></td>
-          <td><small>${fechaFormato}</small></td>
-          <td><span class="status ${estadoInfo.clase}" style="color:${estadoInfo.color}; background-color:${estadoInfo.color}22;"><span class="checkdot" style="background:${estadoInfo.color}"></span>${estadoInfo.etiqueta}</span></td>
-          <td>
-            <div class="assignee">
-              <span class="ava" style="background:${colorAvatar}">${(c.asignado_a || 'U').charAt(0).toUpperCase()}</span>
-              <div>${c.asignado_a || 'Sin asignar'}</div>
-            </div>
-          </td>
-          <td><span class="priority ${prioridadInfo.clase}" style="background-color:${prioridadInfo.color}22; color:${prioridadInfo.color}">${prioridadInfo.label}</span></td>
-          <td><span class="category-badge">${c.categoria || 'General'}</span></td>
-          <td>${clienteNombre}</td>
-          <td><small>${autorNombre}</small></td>
-          <td class="ellipsis">···</td>
-        `;
-        tbody.appendChild(tr);
-      });
-
-      updatePagerButtons();
-    }
-
-    // Actualizar números de página
-    function updatePagerButtons() {
-      const totalPages = Math.ceil(allCases.length / itemsPerPage);
-      const pages = [];
-      
-      // Lógica para mostrar páginas (ej: 1, 2, 3, ..., 8, 9, 10)
-      if (totalPages <= 7) {
-        for (let i = 1; i <= totalPages; i++) pages.push(i);
-      } else {
-        if (currentPage <= 3) {
-          pages.push(1, 2, 3, 4, '...', totalPages);
-        } else if (currentPage >= totalPages - 2) {
-          pages.push(1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
-        } else {
-          pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
-        }
-      }
-
-      pagerContainer.innerHTML = pages.map(p => {
-        if (p === '...') return '<span class="pg">...</span>';
-        return `<span class="pg ${p === currentPage ? 'active' : ''}" data-page="${p}">${p}</span>`;
-      }).join('');
-
-      // Eventos para números de página
-      pagerContainer.querySelectorAll('[data-page]').forEach(el => {
-        el.addEventListener('click', () => {
-          currentPage = parseInt(el.dataset.page);
-          renderPage(currentPage);
+      // Filtro por estado
+      if (filters.estados.length > 0) {
+        const estadoCell = row.querySelector('td:nth-child(4)');
+        const estadoText = estadoCell?.textContent.trim().toLowerCase() || '';
+        const match = filters.estados.some(est => {
+          if (est === 'abierto') return estadoText.includes('activo');
+          if (est === 'en_progreso') return estadoText.includes('progreso');
+          return estadoText.includes(est);
         });
-      });
 
-      // Actualizar botones Previous/Next
-      prevBtn.disabled = currentPage === 1;
-      nextBtn.disabled = currentPage === totalPages;
-      
-      prevBtn.style.opacity = currentPage === 1 ? '0.5' : '1';
-      prevBtn.style.cursor = currentPage === 1 ? 'not-allowed' : 'pointer';
-      nextBtn.style.opacity = currentPage === totalPages ? '0.5' : '1';
-      nextBtn.style.cursor = currentPage === totalPages ? 'not-allowed' : 'pointer';
+        showRow = showRow && match;
+      }
+
+      // Filtro por prioridad
+      if (filters.prioridades.length > 0) {
+        const prioridadCell = row.querySelector('td:nth-child(6)');
+        const prioridadText = prioridadCell?.textContent.trim().toLowerCase() || '';
+        const match = filters.prioridades.some(pri => {
+          if (pri === 'critica' || pri === 'urgente') return prioridadText.includes('urgente') || prioridadText.includes('crÃ­tica');
+          return prioridadText.includes(pri);
+        });
+
+        showRow = showRow && match;
+      }
+
+      // Filtro por categorÃ­a
+      if (filters.categoria) {
+        const categoriaCell = row.querySelector('td:nth-child(7)');
+        const categoriaText = categoriaCell?.textContent.trim() || '';
+        showRow = showRow && categoriaText === filters.categoria;
+      }
+
+      // Filtro por tÃ©cnico asignado
+      if (filters.tecnico) {
+        const tecnicoCell = row.querySelector('td:nth-child(5)');
+        const tecnicoText = tecnicoCell?.textContent.trim() || '';
+        showRow = showRow && tecnicoText.includes(filters.tecnico);
+      }
+
+      row.style.display = showRow ? '' : 'none';
+      if (showRow) visibleCount++;
+    });
+
+    // Si no hay resultados
+    if (visibleCount === 0 && tbody.querySelectorAll('tr[style=""]').length === 0) {
+      const noResultsRow = tbody.querySelector('tr[style*="display: none"]');
+      if (!noResultsRow || tbody.querySelectorAll('tr').length === 1) {
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:20px; color:#6b7280;">No hay casos que coincidan con los filtros seleccionados</td></tr>';
+      }
     }
+  };
 
-    // Cargar datos (segunda instancia)
-    fetch(getApiUrl() + '?action=get_casos_simple')
-      .then(res => {
-        if (!res.ok) {
-          throw new Error(`Error HTTP: ${res.status}`);
-        }
-        return res.json();
-      })
-      .then(data => {
-        allCases = data || [];
-        
-        if (allCases.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:20px;">No hay casos registrados</td></tr>';
-          pagerContainer.innerHTML = '';
-          return;
-        }
-
-        currentPage = 1;
-        renderPage(currentPage);
-      })
-      .catch(err => {
-        console.error('Error cargando tabla:', err);
-        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:20px; color:#dc2626;">Error al cargar casos. Por favor, verifica la conexión.</td></tr>';
-        pagerContainer.innerHTML = '';
-      });
-
-    // Eventos de Previous/Next
-    if (prevBtn) {
-      prevBtn.addEventListener('click', () => {
-        if (currentPage > 1) {
-          currentPage--;
-          renderPage(currentPage);
-        }
-      });
-    }
-
-    if (nextBtn) {
-      nextBtn.addEventListener('click', () => {
-        const totalPages = Math.ceil(allCases.length / itemsPerPage);
-        if (currentPage < totalPages) {
-          currentPage++;
-          renderPage(currentPage);
-        }
-      });
-    }
-  })();
 });
-

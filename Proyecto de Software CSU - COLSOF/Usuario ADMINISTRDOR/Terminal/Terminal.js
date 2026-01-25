@@ -383,17 +383,3 @@ document.addEventListener('DOMContentLoaded', function() {
     // Inicializar la aplicación
     init();
 });
-        }
-        
-        if (resetBtn) {
-            resetBtn.addEventListener('click', resetConfiguration);
-        }
-        
-        if (saveBtn) {
-            saveBtn.addEventListener('click', saveConfiguration);
-        }
-    }
-
-    // Inicializar la aplicación
-    init();
-});

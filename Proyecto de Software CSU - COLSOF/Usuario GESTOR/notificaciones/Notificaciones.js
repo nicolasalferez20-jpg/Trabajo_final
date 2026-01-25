@@ -2,8 +2,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const listContainer = document.getElementById('notificationList');
   const filters = document.querySelectorAll('.filters button');
   
-  // Ruta a la API (archivo `api.php` está en la carpeta padre `Usuario GESTOR`)
-  const API_URL = '../api.php';
+  const host = window.location.hostname;
+  const API_URL = (host === 'localhost' || host === '127.0.0.1') ? 'http://localhost:3001/api' : '/api';
 
   let notifications = [];
 
