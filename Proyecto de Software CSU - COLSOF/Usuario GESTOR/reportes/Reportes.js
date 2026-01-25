@@ -1,7 +1,7 @@
 // Detección de entorno para API
 function getApiUrl() {
   const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-  return isLocal ? 'http://localhost:3001/api' : '../api.php';
+  return isLocal ? 'http://localhost:3001/api' : '/api';
 }
 
 // Función principal de carga de datos
