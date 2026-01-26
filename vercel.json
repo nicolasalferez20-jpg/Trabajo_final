@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "name": "trabajo-final",
+  "installCommand": "npm install --prefix \"Proyecto de Software CSU - COLSOF\"",
+  "buildCommand": "npm run build --prefix \"Proyecto de Software CSU - COLSOF\"",
+  "builds": [
+    { "src": "Proyecto de Software CSU - COLSOF/api/index.js", "use": "@vercel/node" }
+  ],
+  "functions": {
+    "Proyecto de Software CSU - COLSOF/api/index.js": {
+      "maxDuration": 10,
+      "memory": 512
+    }
+  },
+  "routes": [
+    { "src": "/api/(.*)", "dest": "Proyecto de Software CSU - COLSOF/api/index.js" },
+    { "src": "/(.*)", "dest": "Proyecto de Software CSU - COLSOF/api/index.js" }
+  ]
+}

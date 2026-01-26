@@ -7,13 +7,15 @@
     "db:check": "node ./db/check-connection.js",
     "db:seed-users": "node ./db/seed-usuarios.js",
     "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "node --watch server.js",
+    "build": "echo \"Sin paso de build: proyecto Express para Vercel\"",
+    "vercel-build": "npm run build"
   },
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.18.2",
     "pg": "^8.11.3"
-  },
-  "devDependencies": {}
+  }
 }

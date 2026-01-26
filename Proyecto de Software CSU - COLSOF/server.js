@@ -2,10 +2,12 @@ import express from 'express'
 import cors from 'cors'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import bcrypt from 'bcrypt'
 import { pool } from './db/connection.js'
 
 const app = express()
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT || 3000
+const isVercel = process.env.VERCEL === '1'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -38,6 +40,76 @@ app.get('/Usuario\ GESTOR/*', (req, res) => {
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'API running', dbConnected })
+})
+
+// ==================== LOGIN ====================
+
+// Login endpoint
+app.post('/api/login', async (req, res) => {
+  try {
+    const { email, password } = req.body
+
+    // Validar que ambos campos estén presentes
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        error: 'El correo y la contraseña son requeridos'
+      })
+    }
+
+    // Buscar usuario por email
+    const result = await pool.query(
+      'SELECT id, nombre, apellido, email, password, rol, activo FROM usuarios WHERE email = $1',
+      [email.toLowerCase()]
+    )
+
+    if (result.rows.length === 0) {
+      return res.status(401).json({
+        success: false,
+        error: 'El correo o contraseña son incorrectos'
+      })
+    }
+
+    const usuario = result.rows[0]
+
+    // Verificar si el usuario está activo
+    if (!usuario.activo) {
+      return res.status(401).json({
+        success: false,
+        error: 'La cuenta de usuario está inactiva. Contacta al administrador.'
+      })
+    }
+
+    // Comparar contraseña con la hasheada
+    const passwordMatch = await bcrypt.compare(password, usuario.password)
+
+    if (!passwordMatch) {
+      return res.status(401).json({
+        success: false,
+        error: 'El correo o contraseña son incorrectos'
+      })
+    }
+
+    // Login exitoso - retornar datos del usuario (sin la contraseña)
+    res.json({
+      success: true,
+      message: 'Login exitoso',
+      data: {
+        id: usuario.id,
+        nombre: usuario.nombre,
+        apellido: usuario.apellido,
+        email: usuario.email,
+        rol: usuario.rol
+      }
+    })
+
+  } catch (error) {
+    console.error('Error en /api/login:', error)
+    res.status(500).json({
+      success: false,
+      error: 'Error al procesar la solicitud'
+    })
+  }
 })
 
 // Obtener todos los casos
@@ -379,33 +451,38 @@ app.use((req, res) => {
   })
 })
 
-// Iniciar servidor
-app.listen(PORT, async () => {
-  console.log(`✅ Servidor API ejecutándose en http://localhost:${PORT}`)
-  
-  // Verificar conexión a BD al iniciar
-  try {
-    const client = await pool.connect()
-    const result = await client.query('SELECT current_database() as db, current_user as user')
-    client.release()
-    dbConnected = true
-    console.log(`✅ Conexión a BD exitosa: ${result.rows[0].db} (${result.rows[0].user})`)
-  } catch (error) {
-    console.error(`❌ Error en conexión a BD: ${error.message}`)
-    console.log('⚠️  El servidor continúa ejecutándose, pero las queries fallarán.')
-  }
-  
-  console.log(`📊 Endpoints disponibles:`)
-  console.log(`   GET  http://localhost:${PORT}/api/health`)
-  console.log(`   GET  http://localhost:${PORT}/api/casos`)
-  console.log(`   GET  http://localhost:${PORT}/api/casos/:id`)
-  console.log(`   POST http://localhost:${PORT}/api/casos`)
-  console.log(`   PUT  http://localhost:${PORT}/api/casos/:id`)
-  console.log(`   GET  http://localhost:${PORT}/api/estadisticas`)
-  console.log(`   GET  http://localhost:${PORT}/api/usuarios`)
-  console.log(`   GET  http://localhost:${PORT}/api/usuarios/:id`)
-  console.log(`   POST http://localhost:${PORT}/api/usuarios`)
-  console.log(`   PUT  http://localhost:${PORT}/api/usuarios/:id`)
-  console.log(`   GET  http://localhost:${PORT}/api/usuarios-stats`)
-  console.log(`\n🌐 Abre http://localhost:${PORT} en tu navegador`)
-})
+// Iniciar servidor solo en modo local. En Vercel exportamos el handler sin levantar listener.
+if (!isVercel) {
+  app.listen(PORT, async () => {
+    console.log(`✅ Servidor API ejecutándose en http://localhost:${PORT}`)
+    
+    // Verificar conexión a BD al iniciar
+    try {
+      const client = await pool.connect()
+      const result = await client.query('SELECT current_database() as db, current_user as user')
+      client.release()
+      dbConnected = true
+      console.log(`✅ Conexión a BD exitosa: ${result.rows[0].db} (${result.rows[0].user})`)
+    } catch (error) {
+      console.error(`❌ Error en conexión a BD: ${error.message}`)
+      console.log('⚠️  El servidor continúa ejecutándose, pero las queries fallarán.')
+    }
+    
+    console.log(`📊 Endpoints disponibles:`)
+    console.log(`   GET  http://localhost:${PORT}/api/health`)
+    console.log(`   GET  http://localhost:${PORT}/api/casos`)
+    console.log(`   GET  http://localhost:${PORT}/api/casos/:id`)
+    console.log(`   POST http://localhost:${PORT}/api/casos`)
+    console.log(`   PUT  http://localhost:${PORT}/api/casos/:id`)
+    console.log(`   GET  http://localhost:${PORT}/api/estadisticas`)
+    console.log(`   GET  http://localhost:${PORT}/api/usuarios`)
+    console.log(`   GET  http://localhost:${PORT}/api/usuarios/:id`)
+    console.log(`   POST http://localhost:${PORT}/api/usuarios`)
+    console.log(`   PUT  http://localhost:${PORT}/api/usuarios/:id`)
+    console.log(`   GET  http://localhost:${PORT}/api/usuarios-stats`)
+    console.log(`\n🌐 Abre http://localhost:${PORT} en tu navegador`)
+  })
+}
+
+// Exportar app para Vercel (serverless handler)
+export default app

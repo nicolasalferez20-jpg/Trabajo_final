@@ -1,14 +1,71 @@
 // scripts.js - lógica unificada para el dashboard y creación de usuarios
 
 (function(){
+  // =====================
+  // Autenticación y Usuario
+  // =====================
+  
+  // Verificar si hay un usuario autenticado
+  const usuarioData = localStorage.getItem('usuario');
+  if (!usuarioData) {
+    // Si no hay usuario, redirigir al login
+    const loginPath = resolveLoginPath();
+    window.location.href = loginPath;
+    return;
+  }
+
+  // Parsear datos del usuario
+  let usuario;
+  try {
+    usuario = JSON.parse(usuarioData);
+  } catch (e) {
+    console.error('Error al parsear datos del usuario:', e);
+    localStorage.removeItem('usuario');
+    window.location.href = resolveLoginPath();
+    return;
+  }
+
+  // Verificar que el usuario tenga el rol correcto (Administrador o Técnico)
+  if (usuario.rol && !['administrador', 'tecnico'].includes(usuario.rol.toLowerCase())) {
+    alert('No tienes permisos para acceder a esta página.');
+    window.location.href = resolveLoginPath();
+    return;
+  }
+
+  // Actualizar la información del perfil en la interfaz cuando el DOM esté listo
+  document.addEventListener('DOMContentLoaded', function() {
+    const profileName = document.querySelector('.profile-name');
+    const profileEmail = document.querySelector('.profile-email');
+    
+    if (profileName) {
+      profileName.textContent = `${usuario.nombre} ${usuario.apellido}`;
+    }
+    
+    if (profileEmail) {
+      profileEmail.textContent = usuario.email;
+    }
+  });
+
   // Utilidades
   function qs(sel, ctx=document){ return ctx.querySelector(sel); }
   function qsa(sel, ctx=document){ return Array.from(ctx.querySelectorAll(sel)); }
 
   // Configuración de API
-  const API_URL = 'http://localhost:3001/api';
+  const API_URL = 'http://localhost:3000/api';
   let refreshInterval = null;
   let currentTimeRange = '12'; // meses por defecto
+
+  // Función para resolver la ruta del login
+  function resolveLoginPath() {
+    const href = window.location.href;
+    const encodedMarker = 'Proyecto%20de%20Software%20CSU%20-%20COLSOF';
+    if (href.includes(encodedMarker)) return href.split(encodedMarker)[0] + `${encodedMarker}/index.html`;
+
+    const plainMarker = 'Proyecto de Software CSU - COLSOF';
+    if (href.includes(plainMarker)) return href.split(plainMarker)[0] + `${plainMarker}/index.html`;
+
+    return '/index.html';
+  }
 
   // Perfil: abrir/cerrar menú y cerrar sesión
   (function(){
@@ -21,21 +78,15 @@
       });
       document.addEventListener('click', () => menu.classList.remove('show'));
     }
-    const resolveLoginPath = () => {
-      const href = window.location.href;
-      const encodedMarker = 'Proyecto%20de%20Software%20CSU%20-%20COLSOF';
-      if (href.includes(encodedMarker)) return href.split(encodedMarker)[0] + `${encodedMarker}/index.html`;
-
-      const plainMarker = 'Proyecto de Software CSU - COLSOF';
-      if (href.includes(plainMarker)) return href.split(plainMarker)[0] + `${plainMarker}/index.html`;
-
-      return '/index.html';
-    };
 
     const loginPath = resolveLoginPath();
     qsa('.logout-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        alert('Sesión cerrada.');
+        // Limpiar el localStorage
+        localStorage.removeItem('usuario');
+        localStorage.removeItem('rememberedEmail');
+        
+        // Redirigir al login
         window.location.href = loginPath;
       });
     });
