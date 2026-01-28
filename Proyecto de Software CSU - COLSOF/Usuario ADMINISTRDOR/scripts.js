@@ -93,8 +93,6 @@
         alert('Modo standalone - La funcionalidad de logout está desconectada del login.');
       });
     });
-      });
-    });
   })();
 
   // Modal de construcción (compatibilidad con ambos ids)

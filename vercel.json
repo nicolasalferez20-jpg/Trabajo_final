@@ -4,30 +4,10 @@
   "name": "CSU COLSOF - Gestión de Casos",
   "public": false,
   
-  "buildCommand": "npm install",
-  "installCommand": "npm install",
-  
   "env": {
     "NODE_ENV": "production",
     "VERCEL": "1"
   },
-  
-  "builds": [
-    {
-      "src": "Proyecto de Software CSU - COLSOF/api/index.js",
-      "use": "@vercel/node",
-      "config": {
-        "maxDuration": 30
-      }
-    },
-    {
-      "src": "Proyecto de Software CSU - COLSOF/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "Proyecto de Software CSU - COLSOF"
-      }
-    }
-  ],
   
   "functions": {
     "Proyecto de Software CSU - COLSOF/api/index.js": {
