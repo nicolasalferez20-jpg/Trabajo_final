@@ -2,9 +2,10 @@
 
 (function(){
   // =====================
-  // Autenticación y Usuario
+  // Autenticación y Usuario - DESCONECTADO DEL LOGIN
   // =====================
   
+  /* CÓDIGO ORIGINAL COMENTADO - REQUIERE LOGIN
   // Verificar si hay un usuario autenticado
   const usuarioData = localStorage.getItem('usuario');
   if (!usuarioData) {
@@ -31,6 +32,16 @@
     window.location.href = resolveLoginPath();
     return;
   }
+  */
+
+  // Usuario simulado para modo standalone
+  const usuario = {
+    id: 1,
+    nombre: 'Admin',
+    apellido: 'COLSOF',
+    email: 'admincolsof@colsof.com.co',
+    rol: 'administrador'
+  };
 
   // Actualizar la información del perfil en la interfaz cuando el DOM esté listo
   document.addEventListener('DOMContentLoaded', function() {
@@ -79,6 +90,7 @@
       document.addEventListener('click', () => menu.classList.remove('show'));
     }
 
+    /* LOGOUT DESCONECTADO - REQUIERE LOGIN
     const loginPath = resolveLoginPath();
     qsa('.logout-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -88,6 +100,16 @@
         
         // Redirigir al login
         window.location.href = loginPath;
+      });
+    });
+    */
+
+    // Botón de logout en modo standalone
+    qsa('.logout-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        alert('Modo standalone - La funcionalidad de logout está desconectada del login.');
+      });
+    });
       });
     });
   })();

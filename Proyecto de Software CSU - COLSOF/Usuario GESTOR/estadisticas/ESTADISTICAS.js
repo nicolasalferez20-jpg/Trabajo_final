@@ -24,10 +24,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function loadDashboard() {
   try {
+    // Intentar cargar datos desde la API
     const [stats, casos] = await Promise.all([
       api.getEstadisticasCasos(),
       api.getCasos()
     ]);
+
+    console.log('✅ Datos cargados desde la API:', { stats, casos: casos.length });
 
     const normalized = normalizeStats(stats);
 
@@ -38,10 +41,88 @@ async function loadDashboard() {
     renderHourChart(casos);
     renderTechTable(casos);
   } catch (error) {
-    console.error('Error al cargar estadísticas:', error);
-    utils.showToast('No se pudieron cargar las estadísticas', 'error');
-    setFallbackKPIs();
+    console.warn('⚠️ Error al cargar estadísticas desde API:', error);
+    console.log('➡️ Cargando datos de ejemplo para demostración...');
+    
+    // Cargar datos de ejemplo cuando hay error de conexión
+    const casosEjemplo = generarCasosEjemplo();
+    const statsEjemplo = generarEstadisticasEjemplo(casosEjemplo);
+    
+    const normalized = normalizeStats(statsEjemplo);
+    
+    updateKPIs(normalized, casosEjemplo);
+    renderMonthlyChart(casosEjemplo);
+    renderCategoryChart(casosEjemplo);
+    renderPriorityChart(casosEjemplo, normalized);
+    renderHourChart(casosEjemplo);
+    renderTechTable(casosEjemplo);
+    
+    utils.showToast('📊 Mostrando datos de ejemplo (sin conexión a BD)', false);
   }
+}
+
+// Generar casos de ejemplo para demostración
+function generarCasosEjemplo() {
+  const estados = ['Abierto', 'En Progreso', 'Pausado', 'Resuelto', 'Cerrado'];
+  const prioridades = ['Baja', 'Media', 'Alta', 'Urgente', 'Crítica'];
+  const categorias = ['Hardware', 'Software', 'Red', 'Seguridad', 'Backup', 'Telefonía'];
+  const tecnicos = ['Carlos Méndez', 'Ana López', 'Luis Vargas', 'Diana Ruiz', 'Jorge Parra'];
+  
+  const casos = [];
+  const ahora = new Date();
+  
+  // Generar 50 casos de ejemplo distribuidos en los últimos 3 meses
+  for (let i = 1; i <= 50; i++) {
+    const diasAtras = Math.floor(Math.random() * 90); // Últimos 90 días
+    const horasAtras = Math.floor(Math.random() * 24);
+    const fechaCreacion = new Date(ahora);
+    fechaCreacion.setDate(fechaCreacion.getDate() - diasAtras);
+    fechaCreacion.setHours(fechaCreacion.getHours() - horasAtras);
+    
+    const estado = estados[Math.floor(Math.random() * estados.length)];
+    const esResuelto = estado === 'Resuelto' || estado === 'Cerrado';
+    
+    const fechaActualizacion = new Date(fechaCreacion);
+    if (esResuelto) {
+      fechaActualizacion.setHours(fechaActualizacion.getHours() + Math.floor(Math.random() * 48) + 2);
+    }
+    
+    casos.push({
+      id: i,
+      estado: estado,
+      prioridad: prioridades[Math.floor(Math.random() * prioridades.length)],
+      categoria: categorias[Math.floor(Math.random() * categorias.length)],
+      asignado_a: tecnicos[Math.floor(Math.random() * tecnicos.length)],
+      fecha_creacion: fechaCreacion.toISOString(),
+      fecha_actualizacion: fechaActualizacion.toISOString(),
+      cliente: `Cliente ${i}`,
+      descripcion: `Caso de ejemplo ${i}`
+    });
+  }
+  
+  return casos;
+}
+
+function generarEstadisticasEjemplo(casos) {
+  const porEstado = {};
+  const porPrioridad = {};
+  const porTecnico = {};
+  
+  casos.forEach(caso => {
+    // Contar por estado
+    porEstado[caso.estado] = (porEstado[caso.estado] || 0) + 1;
+    // Contar por prioridad
+    porPrioridad[caso.prioridad] = (porPrioridad[caso.prioridad] || 0) + 1;
+    // Contar por técnico
+    porTecnico[caso.asignado_a] = (porTecnico[caso.asignado_a] || 0) + 1;
+  });
+  
+  return {
+    total: casos.length,
+    por_estado: Object.entries(porEstado).map(([estado, count]) => ({ estado, count })),
+    por_prioridad: Object.entries(porPrioridad).map(([prioridad, count]) => ({ prioridad, count })),
+    por_tecnico: Object.entries(porTecnico).map(([asignado_a, count]) => ({ asignado_a, count }))
+  };
 }
 
 function normalizeStats(stats) {

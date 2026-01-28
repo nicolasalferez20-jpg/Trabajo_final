@@ -141,11 +141,26 @@
         </div>
 
         <div class="filters">
-          <button class="active" data-filter="all">Todas</button>
-          <button data-filter="unread">No leídas</button>
-          <button data-filter="urgente">Urgentes</button>
-          <button data-filter="asignacion">Asignaciones</button>
-          <button data-filter="sistema">Sistema</button>
+          <button class="active" data-filter="all">
+            Todas
+            <span class="filter-badge" id="badge-all">0</span>
+          </button>
+          <button data-filter="unread">
+            No leídas
+            <span class="filter-badge" id="badge-unread">0</span>
+          </button>
+          <button data-filter="urgente">
+            Urgentes
+            <span class="filter-badge filter-badge-urgent" id="badge-urgente">0</span>
+          </button>
+          <button data-filter="asignacion">
+            Asignaciones
+            <span class="filter-badge filter-badge-blue" id="badge-asignacion">0</span>
+          </button>
+          <button data-filter="sistema">
+            Sistema
+            <span class="filter-badge filter-badge-gray" id="badge-sistema">0</span>
+          </button>
         </div>
 
         <div id="notificationList" class="notification-list">
@@ -153,6 +168,69 @@
         </div>
       </section>
     </main>
+  </div>
+
+  <!-- Modal de detalles de notificación -->
+  <div id="notificationModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">Detalles del Caso</h2>
+        <button class="modal-close" id="modalClose">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-section">
+          <div class="modal-field">
+            <label>ID del Caso:</label>
+            <span id="modalCasoId">-</span>
+          </div>
+          <div class="modal-field">
+            <label>Categoría:</label>
+            <span id="modalCategoria">-</span>
+          </div>
+          <div class="modal-field">
+            <label>Cliente:</label>
+            <span id="modalCliente">-</span>
+          </div>
+        </div>
+        
+        <div class="modal-section">
+          <div class="modal-field">
+            <label>Estado:</label>
+            <span id="modalEstado" class="status-badge">-</span>
+          </div>
+          <div class="modal-field">
+            <label>Prioridad:</label>
+            <span id="modalPrioridad" class="priority-badge">-</span>
+          </div>
+          <div class="modal-field">
+            <label>Asignado a:</label>
+            <span id="modalAsignado">-</span>
+          </div>
+        </div>
+        
+        <div class="modal-section full-width">
+          <div class="modal-field">
+            <label>Descripción:</label>
+            <p id="modalDescripcion">-</p>
+          </div>
+        </div>
+        
+        <div class="modal-section">
+          <div class="modal-field">
+            <label>Fecha de creación:</label>
+            <span id="modalFechaCreacion">-</span>
+          </div>
+          <div class="modal-field">
+            <label>Última actualización:</label>
+            <span id="modalFechaActualizacion">-</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" id="modalMarkRead">Marcar como leída</button>
+        <button class="btn-primary" id="modalViewCase">Ver caso completo</button>
+      </div>
+    </div>
   </div>
 
   <script src="../../shared/app-init.js"></script>

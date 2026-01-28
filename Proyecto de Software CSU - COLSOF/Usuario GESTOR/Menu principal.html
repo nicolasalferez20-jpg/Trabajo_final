@@ -139,25 +139,55 @@
           <span>Nuevo Caso de servicio</span>
         </a>
         <div class="metrics-panel">
-          <div class="metric">
-            <small>CREADOS</small>
-            <strong id="metric-creados">0</strong>
-            <span class="trend" id="trend-creados"></span>
+          <div class="metric metric-creados">
+            <div class="metric-icon">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M12 4v16m8-8H4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="metric-content">
+              <small>CREADOS</small>
+              <strong id="metric-creados" class="counter">0</strong>
+              <span class="metric-label">Total de casos</span>
+            </div>
           </div>
-          <div class="metric">
-            <small>EN PAUSA</small>
-            <strong id="metric-pausados">0</strong>
-            <span class="trend" id="trend-pausados"></span>
+          <div class="metric metric-pausados">
+            <div class="metric-icon">
+              <svg viewBox="0 0 24 24" fill="none">
+                <rect x="6" y="4" width="4" height="16" rx="1" fill="currentColor"/>
+                <rect x="14" y="4" width="4" height="16" rx="1" fill="currentColor"/>
+              </svg>
+            </div>
+            <div class="metric-content">
+              <small>EN PAUSA</small>
+              <strong id="metric-pausados" class="counter">0</strong>
+              <span class="metric-label">Casos pausados</span>
+            </div>
           </div>
-          <div class="metric">
-            <small>SOLUCIONADOS</small>
-            <strong id="metric-solucionados">0</strong>
-            <span class="trend" id="trend-solucionados"></span>
+          <div class="metric metric-solucionados">
+            <div class="metric-icon">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="metric-content">
+              <small>SOLUCIONADOS</small>
+              <strong id="metric-solucionados" class="counter">0</strong>
+              <span class="metric-label">Casos resueltos</span>
+            </div>
           </div>
-          <div class="metric">
-            <small>CERRADOS</small>
-            <strong id="metric-cerrados">0</strong>
-            <span class="trend" id="trend-cerrados"></span>
+          <div class="metric metric-cerrados">
+            <div class="metric-icon">
+              <svg viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.5"/>
+                <path d="M9 9l6 6m0-6l-6 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="metric-content">
+              <small>CERRADOS</small>
+              <strong id="metric-cerrados" class="counter">0</strong>
+              <span class="metric-label">Casos finalizados</span>
+            </div>
           </div>
         </div>
       </div>

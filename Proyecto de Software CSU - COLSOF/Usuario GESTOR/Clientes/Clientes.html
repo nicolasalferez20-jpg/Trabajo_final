@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CSU - Clientes</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../Estilos.css">
   <link rel="stylesheet" href="Clientes.css">
 </head>
@@ -135,62 +136,168 @@
       <div class="case-card">
         <header class="header">
           <div class="header-left">
-            <div class="icon">🏢</div>
+            <div class="icon"><i class="fas fa-building"></i></div>
             <div>
-              <h1>Clientes</h1>
-              <p>Gestión de empresas y contactos</p>
+              <h1>Gestión de Clientes</h1>
+              <p>Administra y supervisa todas tus empresas clientes</p>
             </div>
           </div>
         </header>
 
         <main>
-
           <!-- KPIs -->
           <section class="kpis">
-            <div class="kpi">
-              <span>Clientes Activos</span>
-              <strong id="activeClients">0</strong>
+            <div class="kpi kpi-activos">
+              <div class="kpi-icon"><i class="fas fa-check-circle"></i></div>
+              <div class="kpi-content">
+                <span class="kpi-label">Clientes Activos</span>
+                <strong class="kpi-value" id="activeClients">0</strong>
+              </div>
             </div>
-            <div class="kpi">
-              <span>Casos Totales</span>
-              <strong id="totalCases">0</strong>
+            <div class="kpi kpi-casos">
+              <div class="kpi-icon"><i class="fas fa-ticket-alt"></i></div>
+              <div class="kpi-content">
+                <span class="kpi-label">Casos Totales</span>
+                <strong class="kpi-value" id="totalCases">0</strong>
+              </div>
             </div>
-            <div class="kpi">
-              <span>Satisfacción Promedio</span>
-              <strong id="avgSatisfaction">0%</strong>
+            <div class="kpi kpi-satisfaccion">
+              <div class="kpi-icon"><i class="fas fa-star"></i></div>
+              <div class="kpi-content">
+                <span class="kpi-label">Satisfacción Promedio</span>
+                <strong class="kpi-value" id="avgSatisfaction">0%</strong>
+              </div>
             </div>
-            <div class="kpi">
-              <span>Contratos Activos</span>
-              <strong id="totalContracts">0</strong>
+            <div class="kpi kpi-contratos">
+              <div class="kpi-icon"><i class="fas fa-file-contract"></i></div>
+              <div class="kpi-content">
+                <span class="kpi-label">Contratos Activos</span>
+                <strong class="kpi-value" id="totalContracts">0</strong>
+              </div>
             </div>
           </section>
-  <!-- Filtros -->
-  <section class="filters">
-    <input type="text" id="search" placeholder="Buscar cliente">
-    <select id="industryFilter" title="Filtrar por industria">
-      <option value="all">Todas las industrias</option>
-      <option>Petróleo y Gas</option>
-      <option>Financiero</option>
-      <option>Gobierno</option>
-      <option>Salud</option>
-      <option>Tecnología</option>
-    </select>
-    <select id="statusFilter" title="Filtrar por estado">
-      <option value="all">Todos los estados</option>
-      <option>Activo</option>
-      <option>Inactivo</option>
-    </select>
-  </section>
 
-  <!-- Listado -->
-  <section id="clientsList"></section>
+          <!-- Filtros -->
+          <section class="filters">
+            <div class="search-box">
+              <i class="fas fa-search"></i>
+              <input type="text" id="search" placeholder="Buscar cliente por nombre, email o teléfono">
+            </div>
+            <select id="industryFilter" title="Filtrar por industria">
+              <option value="all"><i class="fas fa-filter"></i> Todas las industrias</option>
+              <option value="petroleo">Petróleo y Gas</option>
+              <option value="financiero">Financiero</option>
+              <option value="gobierno">Gobierno</option>
+              <option value="salud">Salud</option>
+              <option value="tecnologia">Tecnología</option>
+            </select>
+            <select id="statusFilter" title="Filtrar por estado">
+              <option value="all"><i class="fas fa-circle"></i> Todos los estados</option>
+              <option value="Activo">Activo</option>
+              <option value="Inactivo">Inactivo</option>
+            </select>
+            <button id="btnAddClient" class="btn-add" title="Agregar nuevo cliente">
+              <i class="fas fa-plus"></i> Agregar Cliente
+            </button>
+          </section>
 
-</main>
+          <!-- Listado dinámico -->
+          <section class="clients-grid"></section>
+        </main>
 
         </main>
       </div>
 
     </main>
+  </div>
+
+  <!-- Modal: Ver/Editar Cliente -->
+  <div id="clientModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2><i class="fas fa-building"></i> Detalles del Cliente</h2>
+        <button class="modal-close" onclick="cerrarModal('#clientModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="client-details" id="clientDetails"></div>
+        <div class="modal-section">
+          <h3>Casos Asociados</h3>
+          <div id="clientCases" class="cases-list"></div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="cerrarModal('#clientModal')">Cerrar</button>
+        <button class="btn btn-primary" onclick="if(clienteActual) editarCliente(clienteActual.id)"><i class="fas fa-edit"></i> Editar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Agregar/Editar Cliente -->
+  <div id="editClientModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2><i class="fas fa-plus-circle"></i> <span id="editTitle">Agregar Cliente</span></h2>
+        <button class="modal-close" onclick="cerrarModal('#editClientModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="clientForm" onsubmit="guardarCliente(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="clientName">Nombre de Empresa *</label>
+              <input type="text" id="clientName" placeholder="Ej: Empresa XYZ S.A.S" required>
+            </div>
+            <div class="form-group">
+              <label for="clientEmail">Email *</label>
+              <input type="email" id="clientEmail" placeholder="contacto@empresa.com" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="clientPhone">Teléfono *</label>
+              <input type="tel" id="clientPhone" placeholder="+57 1 2345678" required>
+            </div>
+            <div class="form-group">
+              <label for="clientIndustry">Industria *</label>
+              <select id="clientIndustry" required>
+                <option value="">-- Seleccionar --</option>
+                <option value="petroleo">Petróleo y Gas</option>
+                <option value="financiero">Financiero</option>
+                <option value="gobierno">Gobierno</option>
+                <option value="salud">Salud</option>
+                <option value="tecnologia">Tecnología</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="clientAddress">Dirección</label>
+              <input type="text" id="clientAddress" placeholder="Calle Principal 123, Piso 5">
+            </div>
+            <div class="form-group">
+              <label for="clientCity">Ciudad</label>
+              <input type="text" id="clientCity" placeholder="Bogotá">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="clientContact">Contacto Principal</label>
+              <input type="text" id="clientContact" placeholder="Nombre del contacto">
+            </div>
+            <div class="form-group">
+              <label for="clientStatus">Estado</label>
+              <select id="clientStatus" required>
+                <option value="Activo">Activo</option>
+                <option value="Inactivo">Inactivo</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" onclick="cerrarModal('#editClientModal')">Cancelar</button>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Guardar Cliente</button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 
 <script src="../../shared/app-init.js"></script>

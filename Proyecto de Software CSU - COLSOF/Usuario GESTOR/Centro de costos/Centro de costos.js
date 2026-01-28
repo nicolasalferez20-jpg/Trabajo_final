@@ -32,9 +32,18 @@ function setupEventListeners() {
     });
   }
 
+  /* LOGOUT DESCONECTADO - REQUIERE LOGIN
   if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
       window.location.href = '../../index.html';
+    });
+  }
+  */
+
+  // Botón de logout en modo standalone
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      alert('Modo standalone - La funcionalidad de logout está desconectada del login.');
     });
   }
 

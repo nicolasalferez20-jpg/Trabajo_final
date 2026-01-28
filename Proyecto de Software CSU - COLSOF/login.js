@@ -1,3 +1,7 @@
+// ============================================================
+// ARCHIVO DESCONECTADO DEL PROYECTO - VERSIÓN STANDALONE
+// ============================================================
+
 const form = document.getElementById('loginForm');
 const alertBox = document.getElementById('alertBox');
 const passwordInput = document.getElementById('password');
@@ -6,8 +10,8 @@ const togglePassword = document.querySelector('.toggle');
 const inputGroups = Array.from(form.querySelectorAll('.input-group[data-field]'));
 const submitButton = form.querySelector('.submit');
 
-// API base URL
-const API_URL = window.location.origin + '/api';
+// API base URL - DESCONECTADO
+// const API_URL = window.location.origin + '/api';
 
 // Toggle password visibility
 if (togglePassword) {
@@ -90,10 +94,41 @@ form.addEventListener('submit', async (event) => {
     return;
   }
 
-  // Si la validación es correcta, intentar login
-  await performLogin(emailValue, passwordValue);
+  // Si la validación es correcta, mostrar mensaje de éxito (modo standalone)
+  performLoginStandalone(emailValue, passwordValue);
 });
 
+// ============================================================
+// VERSIÓN STANDALONE - SIN CONEXIÓN A BASE DE DATOS
+// ============================================================
+function performLoginStandalone(email, password) {
+  // Simular proceso de login
+  submitButton.disabled = true;
+  submitButton.textContent = 'Ingresando...';
+  
+  setTimeout(() => {
+    // Resetear botón
+    submitButton.disabled = false;
+    submitButton.textContent = 'Ingresar';
+    
+    // Mostrar mensaje de éxito
+    alertBox.querySelector('.alert-content').innerHTML = `
+      <h2>Modo Demostración</h2>
+      <p>✓ Formulario validado correctamente</p>
+      <p>Email: ${email}</p>
+      <p><small>Este archivo está desconectado del proyecto principal.</small></p>
+    `;
+    alertBox.classList.add('show');
+    alertBox.style.backgroundColor = '#d4edda';
+    alertBox.style.color = '#155724';
+    alertBox.style.borderColor = '#c3e6cb';
+  }, 1000);
+}
+
+// ============================================================
+// CÓDIGO ORIGINAL COMENTADO - REQUIERE CONEXIÓN AL BACKEND
+// ============================================================
+/*
 // Perform login with API
 async function performLogin(email, password) {
   try {
@@ -157,6 +192,7 @@ async function performLogin(email, password) {
     submitButton.textContent = 'Ingresar';
   }
 }
+*/
 
 // Remove error styles on input
 inputGroups.forEach((group) => {

@@ -68,6 +68,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ===== CARGAR DATOS MAESTROS =====
 async function loadMasterData() {
   try {
+    // Cargar casos, usuarios y clientes desde la API
     const [casosRes, usuariosRes] = await Promise.all([
       api.getCasos(),
       api.getUsuarios()
@@ -76,42 +77,96 @@ async function loadMasterData() {
     masterData.casos = casosRes || []
     masterData.usuarios = usuariosRes || []
 
-    // Construir mapas para búsqueda rápida
-    masterData.casos.forEach(c => {
-      if (c.cliente) {
-        masterData.clientes.set(c.cliente.toLowerCase(), {
-          nombre: c.cliente,
-          sede: c.sede || '',
-          contacto: c.contacto || '',
-          correo: c.correo || '',
-          telefono: c.telefono || '',
-          contacto2: c.contacto_alternativo || '',
-          correo2: c.correo_alternativo || '',
-          telefono2: c.telefono_alternativo || '',
-          centroCostos: c.centro_costos || ''
+    console.log('📊 Datos cargados:', {
+      casos: masterData.casos.length,
+      usuarios: masterData.usuarios.length
+    })
+    
+    // Intentar cargar clientes desde endpoint dedicado (si existe)
+    try {
+      const clientesRes = await fetch(`${API_BASE_URL}/clientes`)
+      if (clientesRes.ok) {
+        const clientesData = await clientesRes.json()
+        const clientes = clientesData.data || clientesData || []
+        
+        clientes.forEach(cliente => {
+          const nombre = (cliente.nombre || cliente.razon_social || '').trim().toLowerCase()
+          if (nombre) {
+            masterData.clientes.set(nombre, {
+              nombre: cliente.nombre || cliente.razon_social || '',
+              sede: cliente.direccion || cliente.sede || '',
+              contacto: cliente.contacto || cliente.contacto_principal || '',
+              correo: cliente.email || cliente.correo || '',
+              telefono: cliente.telefono || cliente.celular || '',
+              contacto2: '',
+              correo2: '',
+              telefono2: '',
+              centroCostos: cliente.centro_costos || ''
+            })
+          }
         })
+        
+        console.log('✅ Clientes cargados desde endpoint dedicado:', clientes.length)
+      }
+    } catch (error) {
+      console.log('ℹ️ No hay endpoint de clientes dedicado, usando datos de casos')
+    }
+
+    // Construir mapas para búsqueda rápida desde casos
+    masterData.casos.forEach(c => {
+      const clienteNombre = (c.cliente || c.empresa || '').trim().toLowerCase()
+      
+      if (clienteNombre) {
+        // Solo guardar el primer caso de cada cliente (datos más recientes)
+        if (!masterData.clientes.has(clienteNombre)) {
+          masterData.clientes.set(clienteNombre, {
+            nombre: c.cliente || c.empresa || '',
+            sede: c.sede || c.ubicacion || '',
+            contacto: c.contacto || c.responsable || '',
+            correo: c.correo || c.email || '',
+            telefono: c.telefono || c.celular || '',
+            contacto2: c.contacto_alternativo || '',
+            correo2: c.correo_alternativo || '',
+            telefono2: c.telefono_alternativo || '',
+            centroCostos: c.centro_costos || c.cc || ''
+          })
+        }
       }
       
-      if (c.serial) {
-        masterData.seriales.set(c.serial.toLowerCase(), {
-          serial: c.serial,
-          marca: c.marca || '',
-          tipo: c.tipo || ''
-        })
+      const serialValue = (c.serial || '').trim().toLowerCase()
+      if (serialValue) {
+        // Solo guardar el primer serial encontrado
+        if (!masterData.seriales.has(serialValue)) {
+          masterData.seriales.set(serialValue, {
+            serial: c.serial || '',
+            marca: c.marca || c.fabricante || '',
+            tipo: c.tipo || c.tipo_equipo || ''
+          })
+        }
       }
     })
 
-    // Poblar datalist de clientes
-    Array.from(masterData.clientes.values()).forEach(cliente => {
+    // Poblar datalist de clientes (únicos y ordenados)
+    const clientesUnicos = Array.from(masterData.clientes.values())
+      .sort((a, b) => a.nombre.localeCompare(b.nombre))
+    
+    clientesUnicos.forEach(cliente => {
       const option = document.createElement('option')
       option.value = cliente.nombre
+      // Agregar información adicional en el label
+      option.label = `${cliente.nombre}${cliente.sede ? ' - ' + cliente.sede : ''}`
       datalists.clientes.appendChild(option)
     })
 
-    // Poblar datalist de seriales
-    Array.from(masterData.seriales.values()).forEach(item => {
+    // Poblar datalist de seriales (únicos y ordenados)
+    const serialesUnicos = Array.from(masterData.seriales.values())
+      .sort((a, b) => a.serial.localeCompare(b.serial))
+    
+    serialesUnicos.forEach(item => {
       const option = document.createElement('option')
       option.value = item.serial
+      // Agregar información adicional
+      option.label = `${item.serial}${item.marca ? ' - ' + item.marca : ''}${item.tipo ? ' (' + item.tipo + ')' : ''}`
       datalists.seriales.appendChild(option)
     })
 
@@ -130,26 +185,48 @@ async function loadMasterData() {
       seriales: masterData.seriales.size,
       tecnicos: masterData.usuarios.length
     })
+    
+    // Mostrar toast de éxito
+    if (masterData.clientes.size > 0 || masterData.seriales.size > 0) {
+      utils.showToast(`✅ ${masterData.clientes.size} clientes y ${masterData.seriales.size} equipos cargados`, false)
+    }
   } catch (error) {
     console.error('❌ Error cargando datos:', error)
-    utils.showToast('Error al cargar datos', true)
+    utils.showToast('Error al cargar datos de BD', true)
   }
 }
 
 // ===== EVENT LISTENERS =====
 function setupEventListeners() {
-  // Autocomplete cliente
+  // Autocomplete cliente - mejorado con delay
+  let clienteTimeout
+  formElements.cliente.addEventListener('input', () => {
+    updateSummary()
+    // Debounce para evitar búsquedas excesivas
+    clearTimeout(clienteTimeout)
+    clienteTimeout = setTimeout(() => {
+      if (formElements.cliente.value.length >= 3) {
+        autocompleteCliente()
+      }
+    }, 500)
+  })
   formElements.cliente.addEventListener('blur', () => {
     autocompleteCliente()
   })
   formElements.cliente.addEventListener('change', () => {
     autocompleteCliente()
   })
-  formElements.cliente.addEventListener('input', () => {
-    updateSummary()
-  })
 
-  // Autocomplete serial
+  // Autocomplete serial - mejorado con delay
+  let serialTimeout
+  formElements.serial.addEventListener('input', () => {
+    clearTimeout(serialTimeout)
+    serialTimeout = setTimeout(() => {
+      if (formElements.serial.value.length >= 3) {
+        autocompleteSerial()
+      }
+    }, 500)
+  })
   formElements.serial.addEventListener('blur', () => {
     autocompleteSerial()
   })
@@ -188,10 +265,28 @@ function setupEventListeners() {
 
 // ===== AUTOCOMPLETADO =====
 function autocompleteCliente() {
-  const clienteName = formElements.cliente.value.trim().toLowerCase()
-  const found = masterData.clientes.get(clienteName)
+  const clienteName = formElements.cliente.value.trim()
+  if (!clienteName) return
+  
+  const clienteNameLower = clienteName.toLowerCase()
+  
+  // Búsqueda exacta primero
+  let found = masterData.clientes.get(clienteNameLower)
+  
+  // Si no encuentra exacto, buscar coincidencia parcial
+  if (!found) {
+    for (const [key, value] of masterData.clientes.entries()) {
+      if (key.includes(clienteNameLower) || clienteNameLower.includes(key)) {
+        found = value
+        // Actualizar el valor del input con el nombre completo
+        formElements.cliente.value = value.nombre
+        break
+      }
+    }
+  }
 
   if (found) {
+    console.log('✅ Cliente encontrado:', found.nombre)
     formElements.sede.value = found.sede
     formElements.contacto.value = found.contacto
     formElements.correo.value = found.correo
@@ -200,19 +295,103 @@ function autocompleteCliente() {
     formElements.correo2.value = found.correo2
     formElements.telefono2.value = found.telefono2
     formElements.centroCostos.value = found.centroCostos
+    
+    // Feedback visual
+    formElements.cliente.style.borderColor = '#10b981'
+    setTimeout(() => {
+      formElements.cliente.style.borderColor = ''
+    }, 1000)
+    
     updateSummary()
+  } else {
+    console.log('ℹ️ Cliente no encontrado en BD, se creará nuevo registro')
+    // Limpiar campos si no se encuentra
+    if (!formElements.sede.value) {
+      formElements.contacto.value = ''
+      formElements.correo.value = ''
+      formElements.telefono.value = ''
+      formElements.contacto2.value = ''
+      formElements.correo2.value = ''
+      formElements.telefono2.value = ''
+      formElements.centroCostos.value = ''
+    }
   }
 }
 
+// Función auxiliar para mostrar sugerencias mientras escribe
+function mostrarSugerenciasCliente(valor) {
+  if (!valor || valor.length < 2) return []
+  
+  const valorLower = valor.toLowerCase()
+  const sugerencias = []
+  
+  for (const [key, cliente] of masterData.clientes.entries()) {
+    if (key.includes(valorLower) || cliente.nombre.toLowerCase().includes(valorLower)) {
+      sugerencias.push(cliente)
+      if (sugerencias.length >= 5) break // Máximo 5 sugerencias
+    }
+  }
+  
+  return sugerencias
+}
+
 function autocompleteSerial() {
-  const serialValue = formElements.serial.value.trim().toLowerCase()
-  const found = masterData.seriales.get(serialValue)
+  const serialValue = formElements.serial.value.trim()
+  if (!serialValue) return
+  
+  const serialValueLower = serialValue.toLowerCase()
+  
+  // Búsqueda exacta primero
+  let found = masterData.seriales.get(serialValueLower)
+  
+  // Si no encuentra exacto, buscar coincidencia parcial
+  if (!found) {
+    for (const [key, value] of masterData.seriales.entries()) {
+      if (key.includes(serialValueLower) || serialValueLower.includes(key)) {
+        found = value
+        // Actualizar con el serial completo
+        formElements.serial.value = value.serial
+        break
+      }
+    }
+  }
 
   if (found) {
+    console.log('✅ Serial encontrado:', found.serial)
     formElements.marca.value = found.marca
     formElements.tipo.value = found.tipo
+    
+    // Feedback visual
+    formElements.serial.style.borderColor = '#10b981'
+    setTimeout(() => {
+      formElements.serial.style.borderColor = ''
+    }, 1000)
+    
     updateSummary()
+  } else {
+    console.log('ℹ️ Serial no encontrado en BD, se registrará como nuevo equipo')
+    // Limpiar campos si no se encuentra
+    if (!formElements.marca.value) {
+      formElements.tipo.value = ''
+    }
   }
+}
+
+// Función auxiliar para mostrar sugerencias de seriales
+function mostrarSugerenciasSerial(valor) {
+  if (!valor || valor.length < 2) return []
+  
+  const valorLower = valor.toLowerCase()
+  const sugerencias = []
+  
+  for (const [key, serial] of masterData.seriales.entries()) {
+    if (key.includes(valorLower) || serial.serial.toLowerCase().includes(valorLower)) {
+      sugerencias.push(serial)
+      if (sugerencias.length >= 5) break
+    }
+  }
+  
+  return sugerencias
 }
 
 // ===== ACTUALIZAR RESUMEN =====

@@ -43,6 +43,7 @@
               <path d="M12 22a2 2 0 002-2H10a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.09a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="#111" stroke-width="1.2" fill="none"/>
             </svg>
             <span>Notificaciones</span>
+            <span class="badge hidden" id="notificationBadge">0</span>
           </a>
         </li>
         <li class="menu-item active"><a href="Menu - Reportes.html">
@@ -344,9 +345,9 @@
             <div class="box">
               <h3>Acciones Rápidas</h3>
               <div class="box-actions">
-                <button class="btn btn-secondary"><i class="fas fa-sliders-h"></i> Reporte Personalizado</button>
-                <button class="btn btn-secondary"><i class="fas fa-calendar-check"></i> Programar Reporte</button>
-                <button class="btn btn-secondary"><i class="fas fa-share-alt"></i> Compartir Reporte</button>
+                <button class="btn btn-secondary" id="btnCustomReport"><i class="fas fa-sliders-h"></i> Reporte Personalizado</button>
+                <button class="btn btn-secondary" id="btnScheduleReport"><i class="fas fa-calendar-check"></i> Programar Reporte</button>
+                <button class="btn btn-secondary" id="btnShareReport"><i class="fas fa-share-alt"></i> Compartir Reporte</button>
               </div>
             </div> 
 
@@ -371,6 +372,127 @@
       </div>
 
     </main>
+  </div>
+
+  <!-- Modal: Reporte Personalizado -->
+  <div id="customReportModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2><i class="fas fa-sliders-h"></i> Reporte Personalizado</h2>
+        <button class="modal-close" onclick="cerrarModal('customReportModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="customReportForm">
+          <div class="form-group">
+            <label for="reportName">Nombre del Reporte</label>
+            <input type="text" id="reportName" placeholder="Ej: Reporte de Carga Semanal" required>
+          </div>
+          <div class="form-group">
+            <label for="reportType">Tipo de Reporte</label>
+            <select id="reportType" required>
+              <option value="">-- Seleccionar --</option>
+              <option value="estado">Por Estado</option>
+              <option value="prioridad">Por Prioridad</option>
+              <option value="categoria">Por Categoría</option>
+              <option value="cliente">Por Cliente</option>
+              <option value="desempeño">Desempeño del Equipo</option>
+              <option value="tiempos">Tiempos de Respuesta</option>
+              <option value="satisfaccion">Satisfacción del Cliente</option>
+              <option value="fcr">FCR - Primera Llamada</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="customFilters">Filtros Adicionales</label>
+            <div class="filter-options">
+              <label><input type="checkbox" name="filter" value="urgentes"> Solo Urgentes</label>
+              <label><input type="checkbox" name="filter" value="asignados"> Solo Asignados</label>
+              <label><input type="checkbox" name="filter" value="abiertos"> Solo Abiertos</label>
+              <label><input type="checkbox" name="filter" value="recientes"> Últimos 30 días</label>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="cerrarModal('customReportModal')">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Generar Reporte</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Programar Reporte -->
+  <div id="scheduleReportModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2><i class="fas fa-calendar-check"></i> Programar Reporte</h2>
+        <button class="modal-close" onclick="cerrarModal('scheduleReportModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="scheduleReportForm">
+          <div class="form-group">
+            <label for="scheduleReportName">Nombre del Reporte</label>
+            <input type="text" id="scheduleReportName" placeholder="Ej: Reporte Mensual" required>
+          </div>
+          <div class="form-group">
+            <label for="frequencySelect">Frecuencia</label>
+            <select id="frequencySelect" required>
+              <option value="">-- Seleccionar --</option>
+              <option value="daily">Diario</option>
+              <option value="weekly">Semanal</option>
+              <option value="monthly">Mensual</option>
+              <option value="custom">Personalizado</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="scheduleDay">Día/Hora de Ejecución</label>
+            <input type="datetime-local" id="scheduleDay" required>
+          </div>
+          <div class="form-group">
+            <label for="scheduleEmail">Enviar a (Email)</label>
+            <input type="email" id="scheduleEmail" placeholder="correo@empresa.com" required>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="cerrarModal('scheduleReportModal')">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Programar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Compartir Reporte -->
+  <div id="shareReportModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2><i class="fas fa-share-alt"></i> Compartir Reporte</h2>
+        <button class="modal-close" onclick="cerrarModal('shareReportModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="shareReportForm">
+          <div class="form-group">
+            <label for="shareReportSelect">Seleccionar Reporte</label>
+            <select id="shareReportSelect" required>
+              <option value="">-- Cargando reportes recientes --</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="shareEmails">Correos Electrónicos (separados por comas)</label>
+            <textarea id="shareEmails" placeholder="correo1@empresa.com, correo2@empresa.com" rows="4" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="shareMessage">Mensaje Personalizado</label>
+            <textarea id="shareMessage" placeholder="Escribe un mensaje opcional..." rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label><input type="checkbox" id="shareIncludePDF" checked> Incluir como PDF</label>
+            <label><input type="checkbox" id="shareIncludeExcel"> Incluir como Excel</label>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="cerrarModal('shareReportModal')">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Compartir</button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 
   <script src="../../shared/app-init.js"></script>

@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CSU - Herramientas</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../Estilos.css">
   <link rel="stylesheet" href="Herramientas.css">
 </head>
@@ -90,53 +91,221 @@
           </div>
         </div>
 
-        <div class="tools-grid">
-          <div class="tool-card">
-            <div class="tool-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.9 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
-            <h3 class="tool-title">Diagnóstico de Hardware</h3>
-            <p class="tool-desc">Lista de verificación y herramientas para diagnóstico de fallas en PCs y Laptops.</p>
-            <a href="#" class="tool-btn">Iniciar Diagnóstico</a>
+        <div class="tools-grid" id="toolsContainer">
+          <div class="tool-card-skeleton">
+            <div class="skeleton-icon"></div>
+            <div class="skeleton-text"></div>
+            <div class="skeleton-text" style="width: 80%"></div>
           </div>
-
-          <div class="tool-card">
-            <div class="tool-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg></div>
-            <h3 class="tool-title">Mantenimiento Impresoras</h3>
-            <p class="tool-desc">Guías de limpieza de cabezales, reset de contadores y manuales de servicio.</p>
-            <a href="#" class="tool-btn">Ver Guías</a>
+          <div class="tool-card-skeleton">
+            <div class="skeleton-icon"></div>
+            <div class="skeleton-text"></div>
+            <div class="skeleton-text" style="width: 80%"></div>
           </div>
-
-          <div class="tool-card">
-            <div class="tool-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></div>
-            <h3 class="tool-title">Base de Conocimiento</h3>
-            <p class="tool-desc">Repositorio de soluciones comunes y documentación técnica.</p>
-            <a href="#" class="tool-btn">Buscar Solución</a>
-          </div>
-
-          <div class="tool-card">
-            <div class="tool-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 17l6-6-6-6"/><path d="M12 19h8"/></svg></div>
-            <h3 class="tool-title">Drivers y Controladores</h3>
-            <p class="tool-desc">Acceso rápido a descargas de drivers oficiales para HP, Dell, Lenovo y Epson.</p>
-            <a href="#" class="tool-btn">Descargar Drivers</a>
-          </div>
-
-          <div class="tool-card">
-            <div class="tool-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
-            <h3 class="tool-title">Escritorio Remoto</h3>
-            <p class="tool-desc">Herramientas para conexión remota (AnyDesk, TeamViewer) para soporte a distancia.</p>
-            <a href="#" class="tool-btn">Conectar</a>
-          </div>
-
-          <div class="tool-card">
-            <div class="tool-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div>
-            <h3 class="tool-title">Inventario de Repuestos</h3>
-            <p class="tool-desc">Consulta disponibilidad de toners, discos duros, memorias RAM y periféricos.</p>
-            <a href="#" class="tool-btn">Consultar Stock</a>
+          <div class="tool-card-skeleton">
+            <div class="skeleton-icon"></div>
+            <div class="skeleton-text"></div>
+            <div class="skeleton-text" style="width: 80%"></div>
           </div>
         </div>
       </section>
     </main>
   </div>
+  
+  <!-- Modal: Diagnóstico de Hardware -->
+  <div id="diagnosticoModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2><i class="fas fa-tools"></i> Diagnóstico de Hardware</h2>
+        <button class="modal-close" onclick="cerrarModal('diagnosticoModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-section">
+          <h3>Herramientas Disponibles</h3>
+          <div class="tool-list">
+            <div class="tool-item">
+              <input type="checkbox" id="check1">
+              <label for="check1"><i class="fas fa-check-circle"></i> CPU-Z - Información del procesador</label>
+            </div>
+            <div class="tool-item">
+              <input type="checkbox" id="check2">
+              <label for="check2"><i class="fas fa-check-circle"></i> GPU-Z - Información de gráficos</label>
+            </div>
+            <div class="tool-item">
+              <input type="checkbox" id="check3">
+              <label for="check3"><i class="fas fa-check-circle"></i> MemTest86 - Prueba de memoria RAM</label>
+            </div>
+            <div class="tool-item">
+              <input type="checkbox" id="check4">
+              <label for="check4"><i class="fas fa-check-circle"></i> CrystalDiskInfo - Estado del disco duro</label>
+            </div>
+          </div>
+        </div>
+        <div class="modal-section">
+          <h3>Resultado del Diagnóstico</h3>
+          <div id="diagnosticoResult" class="diagnostic-result">
+            <p>Haz clic en "Ejecutar Diagnóstico" para iniciar...</p>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="cerrarModal('diagnosticoModal')">Cerrar</button>
+          <button type="button" class="btn btn-primary" onclick="ejecutarDiagnostico()"><i class="fas fa-play"></i> Ejecutar Diagnóstico</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Mantenimiento Impresoras -->
+  <div id="impresoresModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2><i class="fas fa-print"></i> Mantenimiento de Impresoras</h2>
+        <button class="modal-close" onclick="cerrarModal('impresoresModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-section">
+          <h3>Selecciona Marca de Impresora</h3>
+          <div class="printer-grid">
+            <button class="printer-btn" onclick="mostrarGuiaImpresora('HP')"><i class="fas fa-print"></i><br>HP</button>
+            <button class="printer-btn" onclick="mostrarGuiaImpresora('Epson')"><i class="fas fa-print"></i><br>Epson</button>
+            <button class="printer-btn" onclick="mostrarGuiaImpresora('Canon')"><i class="fas fa-print"></i><br>Canon</button>
+            <button class="printer-btn" onclick="mostrarGuiaImpresora('Brother')"><i class="fas fa-print"></i><br>Brother</button>
+          </div>
+        </div>
+        <div class="modal-section">
+          <h3 id="guiaTitle">Selecciona una marca para ver la guía</h3>
+          <div id="guiaContent" class="guide-content">
+            <p>Selecciona una marca de impresora para ver las instrucciones detalladas.</p>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="cerrarModal('impresoresModal')">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Base de Conocimiento -->
+  <div id="conocimientoModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2><i class="fas fa-book"></i> Base de Conocimiento</h2>
+        <button class="modal-close" onclick="cerrarModal('conocimientoModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="search-box">
+          <input type="text" id="searchInput" placeholder="Buscar solución..." onkeyup="buscarSolucion(this.value)">
+          <i class="fas fa-search"></i>
+        </div>
+        <div id="solucionesContainer" class="soluciones-grid">
+          <p style="grid-column: 1/-1; text-align: center; color: #999;">Ingresa una palabra clave para buscar...</p>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="cerrarModal('conocimientoModal')">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Drivers -->
+  <div id="driversModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2><i class="fas fa-download"></i> Drivers y Controladores</h2>
+        <button class="modal-close" onclick="cerrarModal('driversModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-section">
+          <h3>Fabricante</h3>
+          <div class="drivers-grid">
+            <button class="driver-btn" onclick="cargarDrivers('HP')">HP</button>
+            <button class="driver-btn" onclick="cargarDrivers('Dell')">Dell</button>
+            <button class="driver-btn" onclick="cargarDrivers('Lenovo')">Lenovo</button>
+            <button class="driver-btn" onclick="cargarDrivers('Epson')">Epson</button>
+          </div>
+        </div>
+        <div id="driversListContainer" class="modal-section">
+          <h3>Drivers Disponibles</h3>
+          <div id="driversList" class="drivers-list">
+            <p>Selecciona un fabricante...</p>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="cerrarModal('driversModal')">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Escritorio Remoto -->
+  <div id="remotoModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2><i class="fas fa-laptop"></i> Escritorio Remoto</h2>
+        <button class="modal-close" onclick="cerrarModal('remotoModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="remotoForm" onsubmit="conectarRemoto(event)">
+          <div class="form-group">
+            <label for="ipEquipo">IP o Nombre del Equipo</label>
+            <input type="text" id="ipEquipo" placeholder="192.168.1.100" required>
+          </div>
+          <div class="form-group">
+            <label for="herramientaRemota">Herramienta</label>
+            <select id="herramientaRemota" required>
+              <option value="">-- Seleccionar --</option>
+              <option value="anydesk">AnyDesk</option>
+              <option value="teamviewer">TeamViewer</option>
+              <option value="rdp">Remote Desktop (Windows)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="usuarioRemoto">Usuario</label>
+            <input type="text" id="usuarioRemoto" placeholder="usuario" required>
+          </div>
+          <div class="form-group">
+            <label for="contraseñaRemota">Contraseña</label>
+            <input type="password" id="contraseñaRemota" placeholder="●●●●●●" required>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" onclick="cerrarModal('remotoModal')">Cancelar</button>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-plug"></i> Conectar Ahora</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Inventario Repuestos -->
+  <div id="inventarioModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2><i class="fas fa-boxes"></i> Inventario de Repuestos</h2>
+        <button class="modal-close" onclick="cerrarModal('inventarioModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="search-box">
+          <input type="text" id="searchRepuestos" placeholder="Buscar repuesto..." onkeyup="filtrarRepuestos(this.value)">
+          <i class="fas fa-search"></i>
+        </div>
+        <div id="repuestosContainer" class="repuestos-table">
+          <div class="table-header">
+            <div>Repuesto</div>
+            <div>Stock</div>
+            <div>Estado</div>
+            <div>Proveedor</div>
+          </div>
+          <div id="repuestosList"></div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="cerrarModal('inventarioModal')">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="../../shared/app-init.js"></script>
   <script src="../script.js"></script>
+  <script src="Herramientas.js"></script>
 </body>
 </html>
