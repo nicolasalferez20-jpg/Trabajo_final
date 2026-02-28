@@ -100,24 +100,6 @@ Trabajo_final/
   README.md
 ```
 
-### 🗺️ Diagrama (visión general)
-
-```mermaid
-flowchart TB
-  A[Next.js - App Router] --> B[app/]
-  B --> R[Rutas y Layouts\npage.tsx, layout.tsx]
-  B --> Seg[Segmentos\n(auth), (protected)]
-  B --> API[API Routes\napp/api]
-  B --> C[Componentes\napp/components]
-  B --> H[Hooks\napp/hooks]
-  B --> L[Lib / Utils\napp/lib]
-  B --> S[Schemas\napp/schemas]
-  B --> T[Types\napp/types]
-  B --> G[Estilos globales\napp/globals.css]
-
-  P[public/] --> Assets[Assets\nimagenes, svg, fuentes]
-```
-
 ## 🔐 Modelo de Roles
 
 | Rol           | Permisos principales               |
