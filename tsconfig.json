@@ -20,9 +20,11 @@
       "@hooks/*": ["./app/hooks/*"],
       "@components/*": ["./app/components/*"],
       "@common/*": ["./app/components/common/*"],
+      "@dashboard/*": ["./app/components/dashboard/*"],
       "@api/*": ["./app/api/*"],
       "@ui/*": ["./app/components/ui/*"],
-      "@lib/*": ["./app/lib/*"]
+      "@lib/*": ["./app/lib/*"],
+      "@schemas/*": ["./app/schemas/*"]
     }
   },
   "include": [
