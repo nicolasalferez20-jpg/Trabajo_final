@@ -1,8 +1,0 @@
-{
-  "timestamp": "2026-02-17T00:09:50.418Z",
-  "queries": {},
-  "error": {
-    "message": "relation \"ticket\" does not exist",
-    "code": "42P01"
-  }
-}
