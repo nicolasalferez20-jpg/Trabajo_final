@@ -5,7 +5,7 @@
 <strong><h1>Web Oficial de COLSOF</h1></strong>
 <a href="https://colsof-app.vercel.app/" target="_blank" rel="noopener noreferrer">
  
-![texto](/public/images/capture.webp)
+![texto](/public/capture.webp)
  
 </a>
 </div>
@@ -51,6 +51,63 @@
 ## 🧭 Índice:
 
 1. [Desarrollo Local](#%EF%B8%8F-desarrollo-local)
+
+## 🗂️ Estructura del Proyecto
+
+El proyecto está estructurado siguiendo el patrón por capas:
+
+- **Presentación (UI)**: Componentes reutilizables y vistas.
+- **Ruteo (App Router)**: Páginas y layouts organizados por segmentos.
+- **Lógica de negocio / utilidades**: Funciones de apoyo, helpers, hooks.
+- **Datos / Integraciones**: Endpoints en `app/api` (cuando aplica).
+
+### 🧱 Estructura principal
+
+```text
+Trabajo_final/
+  app/
+    (auth)/
+    (protected)/
+      data/
+        page.tsx
+      notification/
+        page.tsx
+      statistics/
+        page.tsx
+    api/
+    components/
+      common/
+      dashboard/
+      ui/
+    hooks/
+    lib/
+    schemas/
+    types/
+    globals.css
+    layout.tsx
+    page.tsx
+    not-found.tsx
+  public/
+    fonts/
+    bg.webp
+    bghero.webp
+    default-user.webp
+    favicon.svg
+  postcss.config.mjs
+  next.config.ts
+  tsconfig.json
+  package.json
+  README.md
+```
+
+## 🔐 Modelo de Roles
+
+| Rol           | Permisos principales               |
+| ------------- | ---------------------------------- |
+| Administrador | Gestión de usuarios, control total |
+| Gestor        | Creación y seguimiento de tickets  |
+
+---
 
 ## 🖥️ Desarrollo Local:
 
